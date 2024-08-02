@@ -5,8 +5,12 @@ edition = "2021"
 authors = ["Kurisu <lucifer994@gmail.com>"]
 description = "A simple cross-platform alternative to the unix `tree` command."
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "tree-cli"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 clap = { version = "^4.5.2", features = ["derive"] }
 globset = "0.4.14"
