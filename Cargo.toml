@@ -1,9 +1,9 @@
 [package]
 name = "tree-cli"
 version = "0.1.1"
-edition = "2021"
+edition = "2024"
 authors = ["Kurisu <lucifer994@gmail.com>"]
-description = "A simple cross-platform alternative to the unix `tree` command."
+description = "a simple cross-platform alternative to the unix `tree` command."
 
 
 [[bin]]
