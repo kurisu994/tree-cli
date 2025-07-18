@@ -1,5 +1,5 @@
 # tree-cli
-A simple cross-platform alternative to the unix `tree` command.
+a simple cross-platform alternative to the unix `tree` command.
 
 ## Usage
 `cargo build --release`
