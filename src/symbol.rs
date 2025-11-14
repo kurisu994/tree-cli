@@ -1,3 +1,7 @@
+//! 符号和颜色显示模块
+//!
+//! 该模块负责生成目录树的符号（如 ├── └── 等）和处理彩色输出。
+
 use std::fs::Metadata;
 use std::io;
 
@@ -5,18 +9,18 @@ use term::color;
 
 use crate::Config;
 
-/// 横线
+/// 横线符号 (─)
 pub const HOR: char = '─';
-/// 叉号
+/// 分支符号 (├)
 pub const CRO: char = '├';
-/// 竖线
+/// 垂直线符号 (│)
 pub const VER: char = '│';
-/// 末尾符号
+/// 末尾符号 (└)
 pub const END: char = '└';
-/// 空格
+/// 空格符号
 pub const SPACE: char = ' ';
 
-pub fn set_line_prefix(symbol_switch_list: &Vec<bool>, prefix: &mut String) {
+pub fn set_line_prefix(symbol_switch_list: &[bool], prefix: &mut String) {
     let len = symbol_switch_list.len();
     let index = len.saturating_sub(1);
     prefix.clear();
@@ -74,27 +78,13 @@ fn write_color(
 }
 
 #[cfg(target_os = "windows")]
-fn is_executable(metadata: &Metadata) -> bool {
-    // fixme 没有windows电脑所以不确定是否正确
-    use std::os::windows::fs::{MetadataExt, PermissionsExt};
-    if !metadata.is_file() || metadata.permissions().readonly() {
-        return false;
-    }
-    let path = match metadata.file_name().into_string() {
-        Ok(path) => path,
-        Err(_) => return false,
-    };
-    let ext = path.extension();
-    let executable_extensions = ["exe", "dll", "com", "sys", "bat", "cmd"];
-    if let Some(ext_str) = ext {
-        if executable_extensions.contains(&ext_str.to_ascii_lowercase()) {
-            return true;
-        }
-    }
+fn is_executable(_metadata: &Metadata) -> bool {
+    // Windows 平台暂时不支持可执行文件检测
+    // 可以通过文件扩展名来判断，但这里简化为返回 false
     false
 }
 
-// 仅针对macOS和Windows
+// 针对 Unix 系统（Linux 和 macOS）
 #[cfg(any(target_os = "macos", target_os = "linux"))]
 fn is_executable(metadata: &Metadata) -> bool {
     use std::os::unix::fs::PermissionsExt;

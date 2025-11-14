@@ -1,14 +1,14 @@
 use std::path::Path;
 
 use clap::Parser;
-use globset::{Glob, GlobMatcher};
+use globset::Glob;
 
-use crate::core::{DirSummary, DirTree};
+use crate::core::{DirSummary, DirTree, Config};
 
-mod core;
-mod file_iterator;
-mod filter;
-mod symbol;
+pub mod core;
+pub mod file_iterator;
+pub mod filter;
+pub mod symbol;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None, author)]
@@ -31,13 +31,6 @@ struct Args {
     /// Descend only <level> directories deep
     #[arg(short = 'L', long = "level", default_value_t = usize::max_value())]
     max_level: usize,
-}
-
-struct Config {
-    colorful: bool,
-    show_all: bool,
-    max_level: usize,
-    include_glob: Option<GlobMatcher>,
 }
 
 fn main() {
@@ -65,7 +58,7 @@ fn main() {
     let DirSummary {
         num_folders,
         num_files,
-    } = dir_tree.print_folders(&path).expect("execution failure");
+    } = dir_tree.print_folders(path).expect("execution failure");
 
     writeln!(mt, "\n{} directories, {} files", num_folders, num_files).unwrap()
 }

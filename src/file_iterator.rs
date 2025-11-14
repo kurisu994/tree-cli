@@ -6,12 +6,18 @@ use std::{fs, io};
 use crate::Config;
 use globset::GlobMatcher;
 
+/// 表示文件系统中的一个文件项，包含路径、元数据和层级信息
 #[derive(Debug)]
 pub struct FileItem {
+    /// 文件名
     pub file_name: String,
+    /// 完整路径
     pub path: PathBuf,
+    /// 文件元数据（可能读取失败）
     pub metadata: io::Result<Metadata>,
+    /// 在目录树中的层级深度
     pub level: usize,
+    /// 是否是同级目录中的最后一个项目
     pub is_last: bool,
 }
 
@@ -38,15 +44,25 @@ impl FileItem {
     }
 }
 
+/// 文件系统迭代器，按照广度优先的顺序遍历目录树
 #[derive(Debug)]
 pub struct FileIterator {
+    /// 待处理的文件项目队列
     queue: VecDeque<FileItem>,
+    /// 是否显示隐藏文件
     show_hidden: bool,
+    /// 最大遍历深度
     max_level: usize,
+    /// 全局匹配器，用于过滤文件
     include_glob: Option<GlobMatcher>,
 }
 
 impl FileIterator {
+    /// 创建新的文件迭代器
+    ///
+    /// # 参数
+    /// * `path` - 要遍历的根目录路径
+    /// * `config` - 配置选项
     pub fn new(path: &Path, config: &Config) -> FileIterator {
         let mut queue = VecDeque::new();
         queue.push_back(FileItem::new(path, 0, true));
@@ -78,16 +94,22 @@ impl FileIterator {
     }
 
     fn push_dir(&mut self, item: &FileItem) {
-        let err_msg = format!(
-            "Couldn't retrieve files in directory: {}",
-            item.path.display()
-        );
-        let mut dir_entries: Vec<DirEntry> = fs::read_dir(&item.path)
-            .expect(&err_msg)
-            .into_iter()
-            .collect::<io::Result<Vec<_>>>()
-            .expect(&err_msg);
-        dir_entries.sort_by(|a, b| b.file_name().cmp(&a.file_name()));
+        let dir_entries = match fs::read_dir(&item.path) {
+            Ok(entries) => entries,
+            Err(e) => {
+                eprintln!("错误：无法读取目录 {}：{}", item.path.display(), e);
+                return;
+            }
+        };
+
+        let mut dir_entries: Vec<DirEntry> = match dir_entries.collect() {
+            Ok(entries) => entries,
+            Err(e) => {
+                eprintln!("错误：无法读取目录 {}：{}", item.path.display(), e);
+                return;
+            }
+        };
+        dir_entries.sort_by_key(|b| std::cmp::Reverse(b.file_name()));
 
         let mut entries: Vec<FileItem> = dir_entries
             .iter()

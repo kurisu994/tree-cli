@@ -12,6 +12,24 @@ path = "src/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-clap = { version = "^4.5.2", features = ["derive"] }
-globset = "0.4.14"
-term = "0.7.0"
+clap = { version = "4.5", features = ["derive"] }
+globset = "0.4"
+term = "0.7"
+
+[dev-dependencies]
+tempfile = "3.0"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[[bench]]
+name = "performance"
+harness = false
+
+[[bench]]
+name = "simple_perf"
+harness = false

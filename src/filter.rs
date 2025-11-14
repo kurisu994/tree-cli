@@ -1,7 +1,12 @@
+//! 文件过滤模块
+//!
+//! 该模块提供了文件过滤功能，可以根据配置过滤空目录和隐藏文件。
+
 use std::collections::VecDeque;
 
 use crate::file_iterator::{FileItem, FileIterator};
 
+/// 过滤后的文件迭代器，提供额外的过滤功能
 pub struct FilteredIterator {
     current: FileIterator,
     cache: VecDeque<FileItem>,
