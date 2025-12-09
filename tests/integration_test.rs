@@ -211,3 +211,43 @@ fn test_empty_directory() {
 
     assert!(stdout.contains("0 files") || stdout.contains("0 file"));
 }
+
+/// 测试人类可读文件大小显示
+#[test]
+fn test_human_readable_size() {
+    let temp_dir = TempDir::new().unwrap();
+
+    // 创建不同大小的测试文件
+    fs::write(temp_dir.path().join("small.txt"), "Hello").unwrap(); // 5 bytes
+    let large_content = "x".repeat(2048); // 2KB
+    fs::write(temp_dir.path().join("large.txt"), large_content).unwrap();
+
+    // 确保程序已编译
+    let compile_output = Command::new("cargo")
+        .args(&["build", "--release"])
+        .output()
+        .expect("Failed to compile tree-cli");
+    assert!(compile_output.status.success());
+
+    // 不使用 -h 选项
+    let output = Command::new("./target/release/tree-cli")
+        .arg(temp_dir.path())
+        .output()
+        .expect("Failed to execute tree-cli");
+
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(!stdout.contains("[5B]"));
+    assert!(!stdout.contains("[2.0KB]"));
+
+    // 使用 -s 选项
+    let output = Command::new("./target/release/tree-cli")
+        .args(&["-s", temp_dir.path().to_str().unwrap()])
+        .output()
+        .expect("Failed to execute tree-cli");
+
+    assert!(output.status.success());
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(stdout.contains("[5B]") || stdout.contains("["));
+    assert!(stdout.contains("small.txt"));
+    assert!(stdout.contains("large.txt"));
+}

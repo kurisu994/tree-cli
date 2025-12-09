@@ -16,6 +16,8 @@ pub struct Config {
     pub colorful: bool,
     /// 是否显示隐藏文件
     pub show_all: bool,
+    /// 是否以人类可读格式显示文件大小
+    pub human_readable: bool,
     /// 最大遍历深度
     pub max_level: usize,
     /// 文件过滤模式
@@ -113,11 +115,13 @@ mod tests {
         let config = Config {
             colorful: true,
             show_all: false,
+            human_readable: false,
             max_level: 3,
             include_glob: None,
         };
         assert!(config.colorful);
         assert!(!config.show_all);
+        assert!(!config.human_readable);
         assert_eq!(config.max_level, 3);
         assert!(config.include_glob.is_none());
     }

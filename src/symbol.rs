@@ -20,6 +20,34 @@ pub const END: char = '└';
 /// 空格符号
 pub const SPACE: char = ' ';
 
+/// 将字节转换为人类可读的格式
+pub fn format_human_readable_size(bytes: u64) -> String {
+    const UNITS: &[&str] = &["B", "KB", "MB", "GB", "TB", "PB"];
+
+    if bytes == 0 {
+        return "0B".to_string();
+    }
+
+    let mut size = bytes as f64;
+    let mut unit_index = 0;
+
+    while size >= 1024.0 && unit_index < UNITS.len() - 1 {
+        size /= 1024.0;
+        unit_index += 1;
+    }
+
+    // 根据单位决定小数位数
+    let formatted = if unit_index == 0 {
+        format!("{}", bytes)
+    } else if size < 10.0 {
+        format!("{:.1}", size)
+    } else {
+        format!("{:.0}", size)
+    };
+
+    format!("{}{}", formatted, UNITS[unit_index])
+}
+
 pub fn set_line_prefix(symbol_switch_list: &[bool], prefix: &mut String) {
     let len = symbol_switch_list.len();
     let index = len.saturating_sub(1);
@@ -52,13 +80,24 @@ pub fn print_path(
     t: &mut Box<term::StdoutTerminal>,
     config: &Config,
 ) -> io::Result<()> {
+    // 先打印文件名
     if metadata.is_dir() {
-        write_color(t, config, color::BRIGHT_BLUE, file_name)
+        write_color(t, config, color::BRIGHT_BLUE, file_name)?;
     } else if is_executable(metadata) {
-        write_color(t, config, color::BRIGHT_RED, file_name)
+        write_color(t, config, color::BRIGHT_RED, file_name)?;
     } else {
-        write!(t, "{}", file_name)
+        write!(t, "{}", file_name)?;
     }
+
+    // 如果启用人类可读格式且是文件，显示文件大小
+    if config.human_readable && metadata.is_file() {
+        let size = metadata.len();
+        let size_str = format_human_readable_size(size);
+        // 使用灰色显示文件大小
+        write_color(t, config, color::BRIGHT_BLACK, &format!(" [{}]", size_str))?;
+    }
+
+    Ok(())
 }
 
 fn write_color(
@@ -103,6 +142,18 @@ mod tests {
     use tempfile::TempDir;
     #[cfg(any(target_os = "macos", target_os = "linux"))]
     use std::os::unix::fs::PermissionsExt;
+
+    #[test]
+    fn test_format_human_readable_size() {
+        assert_eq!(format_human_readable_size(0), "0B");
+        assert_eq!(format_human_readable_size(512), "512B");
+        assert_eq!(format_human_readable_size(1024), "1.0KB");
+        assert_eq!(format_human_readable_size(1536), "1.5KB");
+        assert_eq!(format_human_readable_size(1024 * 1024), "1.0MB");
+        assert_eq!(format_human_readable_size(1024 * 1024 * 1024), "1.0GB");
+        assert_eq!(format_human_readable_size(10 * 1024), "10KB");
+        assert_eq!(format_human_readable_size(10240), "10KB");
+    }
 
     #[test]
     fn test_symbol_constants() {
@@ -167,6 +218,7 @@ mod tests {
     fn test_write_color_with_color_enabled() {
         let config = Config {
             colorful: true,
+            human_readable: false,
             show_all: false,
             max_level: 1,
             include_glob: None,
@@ -184,6 +236,7 @@ mod tests {
     fn test_write_color_with_color_disabled() {
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: false,
             max_level: 1,
             include_glob: None,
@@ -234,6 +287,7 @@ mod tests {
     fn test_print_path_directory() {
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: false,
             max_level: 1,
             include_glob: None,
@@ -252,6 +306,7 @@ mod tests {
     fn test_print_path_regular_file() {
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: false,
             max_level: 1,
             include_glob: None,

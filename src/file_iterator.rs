@@ -185,6 +185,7 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: false,
             max_level: 2,
             include_glob: None,
@@ -202,6 +203,7 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: false,
             max_level: 2,
             include_glob: None,
@@ -221,6 +223,7 @@ mod tests {
         // 不显示隐藏文件
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: false,
             max_level: 2,
             include_glob: None,
@@ -235,6 +238,7 @@ mod tests {
         // 显示隐藏文件
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: true,
             max_level: 2,
             include_glob: None,
@@ -255,6 +259,7 @@ mod tests {
 
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: false,
             max_level: 0, // 不进入子目录
             include_glob: None,
@@ -283,6 +288,7 @@ mod tests {
 
         let config = Config {
             colorful: false,
+            human_readable: false,
             show_all: false,
             max_level: 1, // 允许进入一层子目录
             include_glob: None,
