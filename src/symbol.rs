@@ -89,8 +89,8 @@ pub fn print_path(
         write!(t, "{}", file_name)?;
     }
 
-    // 如果启用人类可读格式且是文件，显示文件大小
-    if config.human_readable && metadata.is_file() {
+    // 如果启用大小显示且是文件，显示文件大小
+    if config.size && metadata.is_file() {
         let size = metadata.len();
         let size_str = format_human_readable_size(size);
         // 使用灰色显示文件大小
@@ -218,7 +218,7 @@ mod tests {
     fn test_write_color_with_color_enabled() {
         let config = Config {
             colorful: true,
-            human_readable: false,
+            size: false,
             show_all: false,
             max_level: 1,
             include_glob: None,
@@ -236,7 +236,7 @@ mod tests {
     fn test_write_color_with_color_disabled() {
         let config = Config {
             colorful: false,
-            human_readable: false,
+            size: false,
             show_all: false,
             max_level: 1,
             include_glob: None,
@@ -287,7 +287,7 @@ mod tests {
     fn test_print_path_directory() {
         let config = Config {
             colorful: false,
-            human_readable: false,
+            size: false,
             show_all: false,
             max_level: 1,
             include_glob: None,
@@ -306,7 +306,7 @@ mod tests {
     fn test_print_path_regular_file() {
         let config = Config {
             colorful: false,
-            human_readable: false,
+            size: false,
             show_all: false,
             max_level: 1,
             include_glob: None,

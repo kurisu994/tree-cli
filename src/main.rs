@@ -26,7 +26,7 @@ struct Args {
     color_off: bool,
     /// Print the size of each file in human readable format
     #[arg(short = 's', long = "human-readable")]
-    human_readable: bool,
+    size: bool,
     /// Directory you want to search
     #[arg(value_name = "DIR", default_value = ".")]
     dir: String,
@@ -43,7 +43,7 @@ fn main() {
         show_all,
         color_on,
         color_off,
-        human_readable,
+        size,
         dir,
         include_pattern,
         max_level,
@@ -53,7 +53,7 @@ fn main() {
     let config = Config {
         colorful: color_on || !color_off,
         show_all,
-        human_readable,
+        size,
         max_level,
         include_glob: include_pattern.map(|pat| {
             Glob::new(pat.as_str())
