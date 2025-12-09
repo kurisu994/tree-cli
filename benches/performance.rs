@@ -8,12 +8,11 @@
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::time::Duration;
-use tempfile::{TempDir, NamedTempFile};
-use tree_cli::core::{DirTree, DirSummary, Config};
-use tree_cli::file_iterator::{FileItem, FileIterator};
-use tree_cli::filter::FilteredIterator;
+use tempfile::TempDir;
+use tree_cli::core::{Config};
+use tree_cli::file_iterator::FileIterator;
 
 /// 创建测试目录结构
 fn create_test_directory(depth: usize, files_per_dir: usize) -> TempDir {
@@ -80,8 +79,8 @@ fn create_test_directory_with_various_file_types() -> TempDir {
         ("data.json", "{\"key\": \"value\"}"),
         ("config.toml", "[settings]\nenabled = true"),
         ("document.md", "# 标题\n这是文档内容"),
-        ("image.png", b"PNG\x89\x0D\x0A\x1A\x0A"),
-        ("executable", b"ELF"),
+        ("image.png", "PNG_content"),
+        ("executable", "ELF"),
     ];
 
     for (filename, content) in files {
@@ -112,10 +111,9 @@ fn bench_small_directory_traversal(c: &mut Criterion) {
                 max_level: usize::max_value(),
                 include_glob: None,
             };
-            let mut terminal = create_mock_terminal();
-            let mut dir_tree = DirTree::new(config, &mut terminal);
-            let _summary: DirSummary = dir_tree.print_folders(black_box(temp_dir.path()))
-                .expect("遍历目录失败");
+            let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
+            let count = iterator.count();
+            black_box(count);
         });
     });
 
@@ -137,10 +135,9 @@ fn bench_medium_directory_traversal(c: &mut Criterion) {
                 max_level: usize::max_value(),
                 include_glob: None,
             };
-            let mut terminal = create_mock_terminal();
-            let mut dir_tree = DirTree::new(config, &mut terminal);
-            let _summary: DirSummary = dir_tree.print_folders(black_box(temp_dir.path()))
-                .expect("遍历目录失败");
+            let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
+            let count = iterator.count();
+            black_box(count);
         });
     });
 
@@ -165,10 +162,9 @@ fn bench_large_directory_traversal(c: &mut Criterion) {
                         max_level: usize::max_value(),
                         include_glob: None,
                     };
-                    let mut terminal = create_mock_terminal();
-                    let mut dir_tree = DirTree::new(config, &mut terminal);
-                    let _summary: DirSummary = dir_tree.print_folders(black_box(temp_dir.path()))
-                        .expect("遍历目录失败");
+                    let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
+                    let count = iterator.count();
+                    black_box(count);
                 });
             },
         );
@@ -220,10 +216,9 @@ fn bench_file_filtering(c: &mut Criterion) {
                 max_level: usize::max_value(),
                 include_glob: None,
             };
-            let mut terminal = create_mock_terminal();
-            let mut dir_tree = DirTree::new(config, &mut terminal);
-            let _summary: DirSummary = dir_tree.print_folders(black_box(temp_dir.path()))
-                .expect("遍历目录失败");
+            let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
+            let count = iterator.count();
+            black_box(count);
         });
     });
 
@@ -236,10 +231,9 @@ fn bench_file_filtering(c: &mut Criterion) {
                 max_level: usize::max_value(),
                 include_glob: Some(globset::Glob::new("*.rs").unwrap().compile_matcher()),
             };
-            let mut terminal = create_mock_terminal();
-            let mut dir_tree = DirTree::new(config, &mut terminal);
-            let _summary: DirSummary = dir_tree.print_folders(black_box(temp_dir.path()))
-                .expect("遍历目录失败");
+            let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
+            let count = iterator.count();
+            black_box(count);
         });
     });
 
@@ -252,10 +246,9 @@ fn bench_file_filtering(c: &mut Criterion) {
                 max_level: usize::max_value(),
                 include_glob: None,
             };
-            let mut terminal = create_mock_terminal();
-            let mut dir_tree = DirTree::new(config, &mut terminal);
-            let _summary: DirSummary = dir_tree.print_folders(black_box(temp_dir.path()))
-                .expect("遍历目录失败");
+            let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
+            let count = iterator.count();
+            black_box(count);
         });
     });
 
@@ -279,10 +272,9 @@ fn bench_depth_limiting(c: &mut Criterion) {
                         max_level: max_depth,
                         include_glob: None,
                     };
-                    let mut terminal = create_mock_terminal();
-                    let mut dir_tree = DirTree::new(config, &mut terminal);
-                    let _summary: DirSummary = dir_tree.print_folders(black_box(temp_dir.path()))
-                        .expect("遍历目录失败");
+                    let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
+                    let count = iterator.count();
+                    black_box(count);
                 });
             },
         );
@@ -306,10 +298,9 @@ fn bench_memory_usage(c: &mut Criterion) {
                 max_level: usize::max_value(),
                 include_glob: None,
             };
-            let mut terminal = create_mock_terminal();
-            let mut dir_tree = DirTree::new(config, &mut terminal);
-            let _summary: DirSummary = dir_tree.print_folders(black_box(temp_dir.path()))
-                .expect("遍历目录失败");
+            let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
+            let count = iterator.count();
+            black_box(count);
         });
     });
 

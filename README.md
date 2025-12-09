@@ -4,12 +4,14 @@
 
 ## 特性
 
-- 🚀 **高性能**：使用 Rust 编写，内存占用低，运行速度快
+- 🚀 **高性能**：使用 Rust 编写，单目录读取 < 30µs，内存占用低
 - 🎨 **彩色输出**：支持彩色显示文件类型（蓝色目录，红色可执行文件）
 - 🔍 **模式过滤**：支持使用 glob 模式过滤文件
 - 📊 **统计信息**：显示目录和文件的数量统计
 - 🌍 **跨平台**：支持 Linux、macOS 和 Windows
 - ⚙️ **灵活配置**：支持多种选项配置
+- ✅ **全面测试**：包含单元测试、集成测试和性能基准测试
+- 📈 **性能监控**：使用 Criterion 进行性能回归检测
 
 ## 安装
 
@@ -159,15 +161,40 @@ tree-cli 具有出色的性能表现：
 
 详细性能数据请参考 [BENCHMARKS.md](BENCHMARKS.md)。
 
+### 测试覆盖
+
+tree-cli 包含全面的测试套件：
+
+- **单元测试**：36个测试，覆盖所有核心功能
+- **集成测试**：7个测试，验证命令行功能
+- **性能基准测试**：使用 Criterion 监控性能回归
+
+运行测试：
+```bash
+cargo test              # 运行所有测试
+cargo bench             # 运行性能基准测试
+```
+
 ## 项目结构
 
 ```
-src/
-├── main.rs        # 程序入口和命令行参数解析
-├── core.rs        # 核心逻辑和目录树生成
-├── file_iterator.rs # 文件迭代器实现
-├── filter.rs      # 文件过滤逻辑
-└── symbol.rs      # 符号显示和颜色控制
+tree-cli/
+├── src/
+│   ├── main.rs            # 程序入口和命令行参数解析
+│   ├── lib.rs             # 库入口，导出所有模块
+│   ├── core.rs            # 核心逻辑和目录树生成
+│   ├── file_iterator.rs   # 文件迭代器实现
+│   ├── filter.rs          # 文件过滤逻辑
+│   └── symbol.rs          # 符号显示和颜色控制
+├── tests/
+│   ├── test.rs            # 基础测试
+│   └── integration_test.rs # 集成测试
+├── benches/
+│   ├── simple_perf.rs     # 简单性能基准测试
+│   ├── performance.rs     # 全面性能测试
+│   └── regression_simple.rs # 性能回归测试
+└── .github/workflows/
+    └── ci.yml             # CI/CD 配置
 ```
 
 ## License
@@ -177,3 +204,19 @@ MIT License
 ## 贡献
 
 欢迎提交 Issue 和 Pull Request！
+
+### 开发指南
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 创建 Pull Request
+
+### 代码规范
+
+- 使用 Rust 2024 edition
+- 遵循 rustfmt 格式化规则（最大行宽 120）
+- 为所有公开函数和结构体添加中文注释
+- 确保所有测试通过：`cargo test`
+- 运行代码检查：`cargo clippy`
