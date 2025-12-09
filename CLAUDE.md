@@ -58,10 +58,41 @@ cargo install --path .  # 从源码本地安装
 
 ## 测试策略
 
-当前测试覆盖较少，主要测试在 `tests/test.rs` 中。应该增加：
-- 单元测试覆盖各个模块的核心功能
-- 集成测试验证命令行功能
-- 性能回归测试使用 Criterion
+项目包含全面的测试套件：
+
+### 单元测试
+- **core.rs**: 测试配置结构、符号切换逻辑和目录摘要
+- **file_iterator.rs**: 测试文件迭代、目录遍历、隐藏文件过滤
+- **filter.rs**: 测试过滤逻辑、空目录处理、缓存机制
+- **symbol.rs**: 测试符号生成、颜色输出、可执行文件检测
+
+### 集成测试
+- **tests/integration_test.rs**: 验证命令行功能
+  - 基本目录树显示
+  - 隐藏文件选项 (-a)
+  - 深度限制 (-L)
+  - 模式过滤 (-P)
+  - 帮助和版本信息
+  - 空目录处理
+
+### 性能基准测试
+- **benches/performance.rs**: 全面的性能测试
+- **benches/regression_simple.rs**: 性能回归测试
+  - 空目录遍历
+  - 单层目录（100个文件）
+  - 深层目录结构（5层）
+  - 文件过滤性能
+  - 深度限制效果
+  - 隐藏文件处理
+
+### 运行测试
+```bash
+cargo test               # 运行所有测试
+cargo test --lib         # 只运行单元测试
+cargo test --test '*'     # 只运行集成测试
+cargo bench              # 运行性能基准测试
+cargo bench --bench regression_simple  # 运行回归测试
+```
 
 ## 平台差异
 

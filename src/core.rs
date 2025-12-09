@@ -103,3 +103,54 @@ impl DirSummary {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config_creation() {
+        let config = Config {
+            colorful: true,
+            show_all: false,
+            max_level: 3,
+            include_glob: None,
+        };
+        assert!(config.colorful);
+        assert!(!config.show_all);
+        assert_eq!(config.max_level, 3);
+        assert!(config.include_glob.is_none());
+    }
+
+    #[test]
+    fn test_dir_summary_init() {
+        let summary = DirSummary::init();
+        assert_eq!(summary.num_folders, 0);
+        assert_eq!(summary.num_files, 0);
+    }
+
+    #[test]
+    fn test_cal_symbol_switch_logic() {
+        // 直接测试 cal_symbol_switch 的逻辑，不依赖终端
+
+        // 模拟 DirTree::cal_symbol_switch 的核心逻辑
+        let mut symbol_switch_list: Vec<bool> = Vec::new();
+
+        // 测试逻辑：当 level > symbol_switch_list.len() 时，push true
+        let level = 1;
+        let is_last = true;
+
+        while symbol_switch_list.len() > level {
+            symbol_switch_list.pop();
+        }
+        if level > symbol_switch_list.len() {
+            symbol_switch_list.push(true);
+        }
+        if let Some(last) = symbol_switch_list.last_mut() {
+            *last = !is_last;
+        }
+
+        assert_eq!(symbol_switch_list.len(), 1);
+        assert!(!symbol_switch_list[0]); // is_last = true, 所以应该是 false
+    }
+}

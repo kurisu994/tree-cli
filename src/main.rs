@@ -1,15 +1,17 @@
+//! tree-cli - 高性能目录树显示工具
+//!
+//! 这是一个跨平台的命令行工具，用于以树形结构显示目录内容。
+//! 它是 Unix `tree` 命令的轻量级替代方案。
+
 use std::path::Path;
+use std::io::Write;
 
 use clap::Parser;
 use globset::Glob;
 
-use crate::core::{DirSummary, DirTree, Config};
+use tree_cli::core::{DirSummary, DirTree, Config};
 
-pub mod core;
-pub mod file_iterator;
-pub mod filter;
-pub mod symbol;
-
+/// 高性能目录树显示工具
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None, author)]
 struct Args {

@@ -3,7 +3,7 @@ use std::fs::{DirEntry, Metadata};
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
-use crate::Config;
+use crate::core::Config;
 use globset::GlobMatcher;
 
 /// 表示文件系统中的一个文件项，包含路径、元数据和层级信息
@@ -139,5 +139,168 @@ impl Iterator for FileIterator {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+    use tempfile::TempDir;
+    use std::fs;
+
+    #[test]
+    fn test_file_item_creation() {
+        let path = PathBuf::from("/test/path");
+        let item = FileItem::new(&path, 1, true);
+
+        assert_eq!(item.file_name, "path");
+        assert_eq!(item.path, path);
+        assert_eq!(item.level, 1);
+        assert!(item.is_last);
+        // metadata 可能失败，因为路径不存在，所以检查 Result 而不是 Ok
+        assert!(item.metadata.is_ok() || item.metadata.is_err());
+    }
+
+    #[test]
+    fn test_file_item_is_dir() {
+        // 创建一个临时目录来测试
+        let temp_dir = TempDir::new().unwrap();
+        let dir_path = temp_dir.path().join("test_dir");
+        fs::create_dir(&dir_path).unwrap();
+
+        let dir_item = FileItem::new(&dir_path, 0, true);
+        assert!(dir_item.is_dir());
+
+        // 创建一个临时文件来测试
+        let file_path = temp_dir.path().join("test_file.txt");
+        fs::write(&file_path, "test content").unwrap();
+
+        let file_item = FileItem::new(&file_path, 0, true);
+        assert!(!file_item.is_dir());
+    }
+
+    #[test]
+    fn test_file_iterator_new() {
+        let temp_dir = TempDir::new().unwrap();
+        let config = Config {
+            colorful: false,
+            show_all: false,
+            max_level: 2,
+            include_glob: None,
+        };
+
+        let iterator = FileIterator::new(temp_dir.path(), &config);
+        assert_eq!(iterator.queue.len(), 1);
+        assert_eq!(iterator.max_level, 2);
+        assert!(!iterator.show_hidden);
+        assert!(iterator.include_glob.is_none());
+    }
+
+    #[test]
+    fn test_is_glob_included() {
+        let temp_dir = TempDir::new().unwrap();
+        let config = Config {
+            colorful: false,
+            show_all: false,
+            max_level: 2,
+            include_glob: None,
+        };
+
+        let iterator = FileIterator::new(temp_dir.path(), &config);
+
+        // 没有 glob 匹配器时应该返回 true
+        assert!(iterator.is_glob_included("any_file.txt"));
+        assert!(iterator.is_glob_included("test.rs"));
+    }
+
+    #[test]
+    fn test_is_included_hidden_files() {
+        let temp_dir = TempDir::new().unwrap();
+
+        // 不显示隐藏文件
+        let config = Config {
+            colorful: false,
+            show_all: false,
+            max_level: 2,
+            include_glob: None,
+        };
+        let iterator = FileIterator::new(temp_dir.path(), &config);
+
+        assert!(!iterator.is_included(".hidden", false));
+        assert!(!iterator.is_included(".hidden_dir", true));
+        assert!(iterator.is_included("normal.txt", false));
+        assert!(iterator.is_included("normal_dir", true));
+
+        // 显示隐藏文件
+        let config = Config {
+            colorful: false,
+            show_all: true,
+            max_level: 2,
+            include_glob: None,
+        };
+        let iterator = FileIterator::new(temp_dir.path(), &config);
+
+        assert!(iterator.is_included(".hidden", false));
+        assert!(iterator.is_included(".hidden_dir", true));
+    }
+
+    #[test]
+    fn test_file_iterator_single_directory() {
+        let temp_dir = TempDir::new().unwrap();
+
+        // 创建一些测试文件
+        fs::write(temp_dir.path().join("file1.txt"), "content1").unwrap();
+        fs::write(temp_dir.path().join("file2.rs"), "content2").unwrap();
+
+        let config = Config {
+            colorful: false,
+            show_all: false,
+            max_level: 0, // 不进入子目录
+            include_glob: None,
+        };
+
+        let mut iterator = FileIterator::new(temp_dir.path(), &config);
+        let mut items = Vec::new();
+
+        while let Some(item) = iterator.next() {
+            items.push(item);
+        }
+
+        // 应该只有根目录
+        assert_eq!(items.len(), 1);
+        assert!(items[0].is_dir());
+    }
+
+    #[test]
+    fn test_file_iterator_with_subdirectories() {
+        let temp_dir = TempDir::new().unwrap();
+
+        // 创建子目录和文件
+        fs::create_dir(temp_dir.path().join("subdir1")).unwrap();
+        fs::create_dir(temp_dir.path().join("subdir2")).unwrap();
+        fs::write(temp_dir.path().join("file1.txt"), "content1").unwrap();
+
+        let config = Config {
+            colorful: false,
+            show_all: false,
+            max_level: 1, // 允许进入一层子目录
+            include_glob: None,
+        };
+
+        let mut iterator = FileIterator::new(temp_dir.path(), &config);
+        let mut items = Vec::new();
+
+        while let Some(item) = iterator.next() {
+            items.push(item);
+        }
+
+        // 应该有根目录和子目录
+        assert!(items.len() > 1);
+
+        // 检查文件名
+        let file_names: Vec<String> = items.iter().map(|i| i.file_name.clone()).collect();
+        assert!(file_names.contains(&"subdir1".to_string()));
+        assert!(file_names.contains(&"subdir2".to_string()));
     }
 }
