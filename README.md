@@ -54,6 +54,9 @@ tree-cli -N
 
 # 使用模式过滤文件
 tree-cli -P "*.rs"  # 只显示 Rust 源文件
+
+# 显示文件大小（人类可读格式）
+tree-cli -s
 ```
 
 ### 命令行选项
@@ -63,6 +66,7 @@ tree-cli -P "*.rs"  # 只显示 Rust 源文件
 | `-a` | `--all` | 显示所有文件，包括隐藏文件 |
 | `-C` | `--color` | 启用彩色输出 |
 | `-N` | `--no-color` | 禁用彩色输出 |
+| `-s` | `--human-readable` | 以人类可读格式显示文件大小 |
 | `-P` | `--pattern <模式>` | 只显示匹配指定模式的文件 |
 | `-L` | `--level <层数>` | 限制目录遍历深度 |
 | `-h` | `--help` | 显示帮助信息 |
@@ -116,6 +120,22 @@ tree-cli -a -L 1
 ├── README.md
 ├── config/
 ├── rustfmt.toml
+├── src/
+└── target/
+
+5 directories, 8 files
+
+# 显示文件大小
+tree-cli -s -L 1
+
+.
+├── .git/
+├── .gitignore [32B]
+├── Cargo.lock [2.1KB]
+├── Cargo.toml [185B]
+├── README.md [7.8KB]
+├── config/
+├── rustfmt.toml [23B]
 ├── src/
 └── target/
 
