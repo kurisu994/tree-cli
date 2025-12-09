@@ -15,6 +15,7 @@ fn bench_empty_directory(c: &mut Criterion) {
     let config = Config {
         colorful: false,
         show_all: false,
+        size: false,
         max_level: 10,
         include_glob: None,
     };
@@ -46,6 +47,7 @@ fn bench_single_level_directory(c: &mut Criterion) {
     let config = Config {
         colorful: false,
         show_all: false,
+        size: false,
         max_level: 1,
         include_glob: None,
     };
@@ -91,6 +93,7 @@ fn bench_deep_directory(c: &mut Criterion) {
     let config = Config {
         colorful: false,
         show_all: false,
+        size: false,
         max_level: 5,
         include_glob: None,
     };
@@ -135,6 +138,7 @@ fn bench_filter_performance(c: &mut Criterion) {
         let config = Config {
             colorful: false,
             show_all: false,
+        size: false,
             max_level: 1,
             include_glob: None,
         };
@@ -150,6 +154,7 @@ fn bench_filter_performance(c: &mut Criterion) {
         let config = Config {
             colorful: false,
             show_all: false,
+        size: false,
             max_level: 1,
             include_glob: Some(globset::Glob::new("*.rs").unwrap().compile_matcher()),
         };
@@ -188,6 +193,7 @@ fn bench_depth_limiting(c: &mut Criterion) {
                 let config = Config {
                     colorful: false,
                     show_all: false,
+        size: false,
                     max_level: max_depth,
                     include_glob: None,
                 };
@@ -226,6 +232,7 @@ fn bench_hidden_files(c: &mut Criterion) {
         let config = Config {
             colorful: false,
             show_all: false,
+        size: false,
             max_level: 1,
             include_glob: None,
         };
@@ -241,6 +248,7 @@ fn bench_hidden_files(c: &mut Criterion) {
         let config = Config {
             colorful: false,
             show_all: true,
+        size: false,
             max_level: 1,
             include_glob: None,
         };

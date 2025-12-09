@@ -108,6 +108,7 @@ fn bench_small_directory_traversal(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
+        size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
             };
@@ -132,6 +133,7 @@ fn bench_medium_directory_traversal(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
+        size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
             };
@@ -159,6 +161,7 @@ fn bench_large_directory_traversal(c: &mut Criterion) {
                     let config = Config {
                         colorful: false,
                         show_all: false,
+        size: false,
                         max_level: usize::max_value(),
                         include_glob: None,
                     };
@@ -179,6 +182,7 @@ fn bench_file_iterator(c: &mut Criterion) {
     let config = Config {
         colorful: false,
         show_all: false,
+        size: false,
         max_level: usize::max_value(),
         include_glob: None,
     };
@@ -213,6 +217,7 @@ fn bench_file_filtering(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
+        size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
             };
@@ -228,6 +233,7 @@ fn bench_file_filtering(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
+        size: false,
                 max_level: usize::max_value(),
                 include_glob: Some(globset::Glob::new("*.rs").unwrap().compile_matcher()),
             };
@@ -243,6 +249,7 @@ fn bench_file_filtering(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: true,
+        size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
             };
@@ -269,6 +276,7 @@ fn bench_depth_limiting(c: &mut Criterion) {
                     let config = Config {
                         colorful: false,
                         show_all: false,
+        size: false,
                         max_level: max_depth,
                         include_glob: None,
                     };
@@ -295,6 +303,7 @@ fn bench_memory_usage(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
+        size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
             };
