@@ -30,24 +30,42 @@ cargo build              # 调试版本
 cargo build --release    # 发布版本（启用 LTO 和优化等级 3）
 
 # 测试
-cargo test               # 运行单元测试
-cargo bench              # 运行性能基准测试（使用 Criterion）
+cargo test               # 运行所有测试
+cargo test --lib         # 只运行单元测试
+cargo test --test '*'     # 只运行集成测试
+cargo test --bin tree-cli # 测试二进制
+cargo test --doc          # 运行文档测试
+cargo test --exact <test_name>  # 运行单个测试
+
+# 性能基准测试
+cargo bench              # 运行所有性能基准测试
+cargo bench --bench simple_perf      # 运行简化基准测试
+cargo bench --bench regression_simple # 运行回归基准测试
+cargo bench --bench performance       # 运行完整性能测试
 
 # 代码质量
 cargo clippy            # 代码检查
 cargo fmt               # 代码格式化（遵循 rustfmt.toml 配置）
+cargo fmt --check        # 检查格式但不修改文件
 
 # 安装
 cargo install --path .  # 从源码本地安装
+cargo install --git https://github.com/kurisu994/tree-cli.git  # 从 GitHub 安装
+
+# 运行
+./target/debug/tree-cli  # 运行调试版本
+./target/release/tree-cli # 运行发布版本
 ```
 
 ## 代码规范
 
 - 使用 Rust 2024 Edition
-- 最大行宽：120 字符
+- 最大行宽：120 字符（在 rustfmt.toml 中配置）
 - 使用 4 个空格缩进
 - 所有公开的函数和结构体必须包含中文注释
 - 复杂逻辑需要行内中文注释
+- 模块级注释使用 `//!`，函数/结构体注释使用 `///`
+- 错误信息优先使用中文
 
 ## 性能考虑
 
@@ -60,13 +78,13 @@ cargo install --path .  # 从源码本地安装
 
 项目包含全面的测试套件：
 
-### 单元测试
+### 单元测试（36个测试）
 - **core.rs**: 测试配置结构、符号切换逻辑和目录摘要
 - **file_iterator.rs**: 测试文件迭代、目录遍历、隐藏文件过滤
 - **filter.rs**: 测试过滤逻辑、空目录处理、缓存机制
 - **symbol.rs**: 测试符号生成、颜色输出、可执行文件检测
 
-### 集成测试
+### 集成测试（7个测试）
 - **tests/integration_test.rs**: 验证命令行功能
   - 基本目录树显示
   - 隐藏文件选项 (-a)
@@ -77,21 +95,24 @@ cargo install --path .  # 从源码本地安装
 
 ### 性能基准测试
 - **benches/performance.rs**: 全面的性能测试
-- **benches/regression_simple.rs**: 性能回归测试
-  - 空目录遍历
-  - 单层目录（100个文件）
-  - 深层目录结构（5层）
-  - 文件过滤性能
-  - 深度限制效果
-  - 隐藏文件处理
+- **benches/regression_simple.rs**: 性能回归测试，用于 CI/CD
+  - 空目录遍历：~14.5 µs
+  - 单层目录（100个文件）：~295 µs
+  - 深层目录结构（5层）：~161 µs
+  - 文件过滤性能：35-39 µs
+  - 深度限制效果：22-138 µs
+  - 隐藏文件处理：~203 µs
 
 ### 运行测试
 ```bash
 cargo test               # 运行所有测试
 cargo test --lib         # 只运行单元测试
 cargo test --test '*'     # 只运行集成测试
-cargo bench              # 运行性能基准测试
-cargo bench --bench regression_simple  # 运行回归测试
+cargo test --doc          # 运行文档测试
+
+# 性能基准测试
+cargo bench              # 运行所有性能基准测试
+cargo bench --bench regression_simple  # 运行回归测试（用于 CI/CD）
 ```
 
 ## 平台差异
@@ -102,11 +123,53 @@ cargo bench --bench regression_simple  # 运行回归测试
 
 ## 依赖管理
 
-主要依赖：
-- `clap 4.5`: 命令行参数解析
-- `globset 0.4`: 文件模式匹配
+### 主要依赖
+- `clap 4.5`: 命令行参数解析，支持 derive 特性
+- `globset 0.4`: 文件模式匹配，支持 glob 表达式
 - `term 0.7`: 终端控制和彩色输出
 
-开发依赖：
-- `tempfile 3.0`: 测试用临时文件
-- `criterion 0.5`: 性能基准测试
+### 开发依赖
+- `tempfile 3.0`: 测试用临时文件创建
+- `criterion 0.5`: 性能基准测试框架，支持 HTML 报告
+- `assert_cmd 2.0`: 集成测试工具
+- `predicates 3.0`: 测试断言库
+
+### 项目结构注意
+- 项目同时定义了二进制目标和库目标
+- `src/main.rs`: 二进制程序入口
+- `src/lib.rs`: 库入口，导出所有模块供测试和基准测试使用
+- 基准测试需要通过库来访问内部模块
+
+## 调试和故障排除
+
+### 常见问题
+
+1. **基准测试编译错误**
+   - 确保 `term` crate 的 terminal trait 实现正确
+   - 基准测试不依赖实际终端输出，使用模拟终端
+
+2. **性能测试超时**
+   - 减少测试数据量或增加 sample 数量
+   - 使用 `cargo bench -- --measurement-time <seconds>` 调整测试时间
+
+3. **测试失败**
+   - 单元测试检查错误断言
+   - 集成测试确保程序已编译：`cargo build --release`
+
+### 性能分析技巧
+
+1. **使用 Criterion HTML 报告**
+   - 报告位置：`target/criterion/report/index.html`
+   - 包含详细的性能对比和统计分析
+
+2. **本地性能监控**
+   ```bash
+   # 使用 time 命令测量执行时间
+   time cargo run --release -- /path/to/large/directory
+
+   # 使用 perf (Linux) 或 Instruments (macOS) 进行深入分析
+   ```
+
+3. **CI/CD 性能回归检测**
+   - 自动在 PR 中运行性能基准测试
+   - 性能下降超过 200% 会触发告警
