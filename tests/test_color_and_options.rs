@@ -12,15 +12,8 @@ fn test_color_output() {
     fs::write(temp_dir.path().join("file.txt"), "content").unwrap();
     fs::write(temp_dir.path().join("script.sh"), "#!/bin/bash\necho test").unwrap();
 
-    // 先编译程序
-    let compile_output = Command::new("cargo")
-        .args(["build", "--release"])
-        .output()
-        .expect("Failed to compile tree-cli");
-    assert!(compile_output.status.success());
-
     // 测试强制启用颜色 (-C)
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .args(["-C", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
@@ -32,7 +25,7 @@ fn test_color_output() {
     assert!(stdout.contains("\x1b[")); // ANSI escape sequence
 
     // 测试禁用颜色 (-N)
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .args(["-N", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
@@ -60,15 +53,8 @@ fn test_multiple_parameters() {
     let large_content = "x".repeat(1024 * 10); // 10KB
     fs::write(temp_dir.path().join("large.txt"), large_content).unwrap();
 
-    // 先编译程序
-    let compile_output = Command::new("cargo")
-        .args(["build", "--release"])
-        .output()
-        .expect("Failed to compile tree-cli");
-    assert!(compile_output.status.success());
-
     // 测试组合多个参数：显示所有文件 + 限制深度 + 显示大小 + 只显示txt文件
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .args([
             "-a", // 显示所有文件
             "-L",
@@ -99,15 +85,8 @@ fn test_multiple_parameters() {
 /// 测试错误处理
 #[test]
 fn test_error_handling() {
-    // 先编译程序
-    let compile_output = Command::new("cargo")
-        .args(["build", "--release"])
-        .output()
-        .expect("Failed to compile tree-cli");
-    assert!(compile_output.status.success());
-
     // 测试不存在的路径
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .arg("/nonexistent/path/that/should/not/exist")
         .output()
         .expect("Failed to execute tree-cli");
@@ -128,7 +107,7 @@ fn test_error_handling() {
     // 测试空字符串路径（在某些系统上可能触发错误）
     #[cfg(unix)]
     {
-        let _output = Command::new("./target/release/tree-cli")
+        let _output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
             .arg("")
             .output()
             .expect("Failed to execute tree-cli");
@@ -180,15 +159,8 @@ fn test_special_characters_and_unicode() {
     // 确保至少创建了一些文件
     assert!(!created_files.is_empty(), "No test files were created");
 
-    // 先编译程序
-    let compile_output = Command::new("cargo")
-        .args(["build", "--release"])
-        .output()
-        .expect("Failed to compile tree-cli");
-    assert!(compile_output.status.success());
-
     // 测试程序能否正确处理这些文件名
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .args(["-a", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
@@ -227,15 +199,8 @@ fn test_deep_nested_directories() {
     fs::create_dir_all(path.parent().unwrap()).unwrap();
     fs::write(path, "deep file").unwrap();
 
-    // 先编译程序
-    let compile_output = Command::new("cargo")
-        .args(["build", "--release"])
-        .output()
-        .expect("Failed to compile tree-cli");
-    assert!(compile_output.status.success());
-
     // 不限制深度
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .arg(temp_dir.path())
         .output()
         .expect("Failed to execute tree-cli");
@@ -248,7 +213,7 @@ fn test_deep_nested_directories() {
     assert!(stdout.contains("level49"));
 
     // 限制深度为10
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .args(["-L", "10", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
@@ -289,15 +254,8 @@ fn test_symlink_handling() {
     // 创建指向不存在的文件的符号链接
     symlink(temp_dir.path().join("nonexistent"), temp_dir.path().join("broken_link")).unwrap();
 
-    // 先编译程序
-    let compile_output = Command::new("cargo")
-        .args(["build", "--release"])
-        .output()
-        .expect("Failed to compile tree-cli");
-    assert!(compile_output.status.success());
-
     // 测试符号链接显示
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .args(["-a", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
@@ -319,16 +277,9 @@ fn test_large_directory_performance() {
         fs::write(temp_dir.path().join(format!("file_{:04}.txt", i)), "content").unwrap();
     }
 
-    // 先编译程序
-    let compile_output = Command::new("cargo")
-        .args(["build", "--release"])
-        .output()
-        .expect("Failed to compile tree-cli");
-    assert!(compile_output.status.success());
-
     // 测量执行时间
     let start = std::time::Instant::now();
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .arg(temp_dir.path())
         .output()
         .expect("Failed to execute tree-cli");
@@ -358,7 +309,7 @@ fn test_exclude_short_option() {
     fs::write(temp_dir.path().join("test.md"), "markdown").unwrap();
 
     // 测试使用 -E 选项排除所有 .txt 文件
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .args(["-E", "*.txt", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
@@ -375,17 +326,10 @@ fn test_exclude_short_option() {
 /// 测试边界值：空路径和根目录
 #[test]
 fn test_edge_cases_paths() {
-    // 先编译程序
-    let compile_output = Command::new("cargo")
-        .args(["build", "--release"])
-        .output()
-        .expect("Failed to compile tree-cli");
-    assert!(compile_output.status.success());
-
     // 测试根目录（Unix系统）
     #[cfg(unix)]
     {
-        let output = Command::new("./target/release/tree-cli")
+        let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
             .args(["-L", "1", "/"]) // 限制深度避免扫描整个文件系统
             .output()
             .expect("Failed to execute tree-cli");
@@ -396,7 +340,7 @@ fn test_edge_cases_paths() {
     }
 
     // 测试当前目录（.）
-    let output = Command::new("./target/release/tree-cli")
+    let output = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"))
         .args(["-L", "1", "."])
         .output()
         .expect("Failed to execute tree-cli");
