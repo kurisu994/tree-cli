@@ -37,17 +37,11 @@ jobs:
           target
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-    - name: Build
-      run: cargo build --verbose
+    - name: Build binary
+      run: cargo build --bin tree-cli --verbose
 
-    - name: Run unit tests
-      run: cargo test --lib --bins --verbose
-
-    - name: Run integration tests
-      run: cargo test --test '*' --verbose
-
-    - name: Run doc tests
-      run: cargo test --doc --verbose
+    - name: Run all tests
+      run: cargo test --verbose
 
   coverage:
     name: Code coverage
@@ -101,7 +95,7 @@ jobs:
         key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Run benchmarks
-      run: cargo bench --bench regression
+      run: cargo bench --bench regression_simple
 
     - name: Store benchmark result
       uses: benchmark-action/github-action-benchmark@v1
