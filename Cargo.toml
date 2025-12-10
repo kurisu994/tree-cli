@@ -1,5 +1,5 @@
 [package]
-name = "tree-cli"
+name = "tree-cli-rs"
 version = "1.0.0"
 edition = "2024"
 authors = ["Kurisu <lucifer994@gmail.com>"]
