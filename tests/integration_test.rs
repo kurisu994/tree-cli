@@ -16,6 +16,11 @@ fn test_basic_tree_display() {
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"));
     let output = cmd.arg(temp_dir.path()).output().expect("Failed to execute tree-cli");
 
+    if !output.status.success() {
+        eprintln!("Command failed with status: {:?}", output.status);
+        eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+    }
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).unwrap();
 
@@ -39,6 +44,12 @@ fn test_show_all_files() {
     // 不使用 -a 选项
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"));
     let output = cmd.arg(temp_dir.path()).output().expect("Failed to execute tree-cli");
+
+    if !output.status.success() {
+        eprintln!("Command failed with status: {:?}", output.status);
+        eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+    }
 
     let stdout = String::from_utf8(output.stdout).unwrap();
     assert!(!stdout.contains(".hidden"));
@@ -68,6 +79,12 @@ fn test_level_limit() {
     // 不限制深度
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"));
     let output = cmd.arg(temp_dir.path()).output().expect("Failed to execute tree-cli");
+
+    if !output.status.success() {
+        eprintln!("Command failed with status: {:?}", output.status);
+        eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+    }
 
     let stdout = String::from_utf8(output.stdout).unwrap();
     assert!(stdout.contains("level1"));
@@ -105,6 +122,12 @@ fn test_pattern_filter() {
         .args(["-P", "*.rs", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
+
+    if !output.status.success() {
+        eprintln!("Command failed with status: {:?}", output.status);
+        eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+    }
 
     let stdout = String::from_utf8(output.stdout).unwrap();
     assert!(stdout.contains("file2.rs"));
@@ -147,6 +170,12 @@ fn test_empty_directory() {
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"));
     let output = cmd.arg(temp_dir.path()).output().expect("Failed to execute tree-cli");
 
+    if !output.status.success() {
+        eprintln!("Command failed with status: {:?}", output.status);
+        eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+    }
+
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).unwrap();
 
@@ -177,6 +206,12 @@ fn test_human_readable_size() {
         .args(["-s", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
+
+    if !output.status.success() {
+        eprintln!("Command failed with status: {:?}", output.status);
+        eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+    }
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).unwrap();
