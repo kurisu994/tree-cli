@@ -53,9 +53,26 @@ fn main() {
         max_level,
     } = Args::parse();
     let path = Path::new(&dir);
-    let mut mt = term::stdout().expect("Could not unwrap term::stdout.");
+
+    // 在非 TTY 环境（如 CI）中，term::stdout() 返回 None
+    // 此时使用缓冲输出（自动禁用彩色）
+    let mut mt = term::stdout().unwrap_or_else(|| {
+        // 创建一个基于标准输出的缓冲终端
+        Box::new(term::terminfo::TerminfoTerminal::new(std::io::stdout()).unwrap())
+    });
+
+    // 如果不是 TTY 环境，自动禁用彩色输出（除非用户明确指定 --color）
+    let is_tty = term::stdout().is_some();
+    let colorful = if color_on {
+        true
+    } else if color_off {
+        false
+    } else {
+        is_tty
+    };
+
     let config = Config {
-        colorful: color_on || !color_off,
+        colorful,
         show_all,
         size,
         max_level,
