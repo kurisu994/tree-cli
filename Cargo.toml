@@ -1,9 +1,24 @@
 [package]
 name = "tree-cli"
-version = "0.1.1"
+version = "1.0.0"
 edition = "2024"
 authors = ["Kurisu <lucifer994@gmail.com>"]
-description = "a simple cross-platform alternative to the unix `tree` command."
+description = "A simple cross-platform alternative to the unix `tree` command"
+license = "MIT"
+repository = "https://github.com/your-username/tree-cli"
+homepage = "https://github.com/your-username/tree-cli"
+documentation = "https://docs.rs/tree-cli"
+readme = "README.md"
+keywords = ["tree", "cli", "filesystem", "directory", "command-line"]
+categories = ["command-line-utilities", "filesystem"]
+exclude = [
+    "target/",
+    ".github/",
+    "benches/",
+    "tests/",
+    "*.md",
+    ".gitignore",
+]
 
 
 [[bin]]
