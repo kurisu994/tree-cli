@@ -66,7 +66,10 @@ jobs:
       uses: taiki-e/install-action@cargo-llvm-cov
 
     - name: Generate coverage report
-      run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+      # 注意：只收集单元测试和库代码的覆盖率，跳过集成测试
+      # 原因：cargo llvm-cov 使用自定义 target 目录时，assert_cmd::cargo_bin! 无法正确定位二进制文件
+      # 集成测试已在 test job 中运行，参见 CODE_COVERAGE_FIX.md 了解详情
+      run: cargo llvm-cov --all-features --workspace --lib --bins --lcov --output-path lcov.info
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
