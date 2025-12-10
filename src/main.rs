@@ -34,7 +34,7 @@ struct Args {
     #[arg(short = 'P', long = "pattern")]
     include_pattern: Option<String>,
     /// Exclude those files matching <exclude_pattern>
-    #[arg(short = 'I', long = "exclude")]
+    #[arg(short = 'E', long = "exclude")]
     exclude_pattern: Option<String>,
     /// Descend only <level> directories deep
     #[arg(short = 'L', long = "level", default_value_t = usize::max_value())]

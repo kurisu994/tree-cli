@@ -22,7 +22,7 @@ pub const SPACE: char = ' ';
 
 /// 将字节转换为人类可读的格式
 pub fn format_human_readable_size(bytes: u64) -> String {
-    const UNITS: &[&str] = &["B", "KB", "MB", "GB", "TB", "PB"];
+    const UNITS: &[&str] = &["B", "KB", "MB", "GB", "TB", "PB", "EB"];
 
     if bytes == 0 {
         return "0B".to_string();
@@ -145,6 +145,7 @@ mod tests {
 
     #[test]
     fn test_format_human_readable_size() {
+        // 基本测试
         assert_eq!(format_human_readable_size(0), "0B");
         assert_eq!(format_human_readable_size(512), "512B");
         assert_eq!(format_human_readable_size(1024), "1.0KB");
@@ -153,6 +154,39 @@ mod tests {
         assert_eq!(format_human_readable_size(1024 * 1024 * 1024), "1.0GB");
         assert_eq!(format_human_readable_size(10 * 1024), "10KB");
         assert_eq!(format_human_readable_size(10240), "10KB");
+    }
+
+    #[test]
+    fn test_format_human_readable_size_boundary_values() {
+        // 边界值测试
+        assert_eq!(format_human_readable_size(1), "1B");
+        assert_eq!(format_human_readable_size(1023), "1023B");
+        assert_eq!(format_human_readable_size(1024), "1.0KB");
+
+        // 测试单位转换边界 - 函数会进行四舍五入
+        assert_eq!(format_human_readable_size(1024 * 1024 - 1), "1024KB"); // 1048575 bytes = 1024KB (四舍五入)
+        assert_eq!(format_human_readable_size(1024 * 1024), "1.0MB");
+        assert_eq!(format_human_readable_size(1024 * 1024 * 1024 - 1), "1024MB"); // 1073741823 bytes = 1024MB (四舍五入)
+        assert_eq!(format_human_readable_size(1024 * 1024 * 1024), "1.0GB");
+
+        // 测试大数值
+        assert_eq!(format_human_readable_size(u64::MAX), "16EB");
+
+        // 测试小数格式化
+        assert_eq!(format_human_readable_size(2048), "2.0KB");
+        assert_eq!(format_human_readable_size(9216), "9.0KB");
+        assert_eq!(format_human_readable_size(10240), "10KB");
+        assert_eq!(format_human_readable_size(11264), "11KB");
+
+        // 测试TB和PB
+        let tb = 1024_u64.pow(4);
+        let pb = 1024_u64.pow(5);
+        assert_eq!(format_human_readable_size(tb), "1.0TB");
+        assert_eq!(format_human_readable_size(pb), "1.0PB");
+
+        // 测试特殊边界值
+        assert_eq!(format_human_readable_size(10239), "10.0KB"); // 四舍五入到10.0KB
+        assert_eq!(format_human_readable_size(10240), "10KB");  // 整好10KB
     }
 
     #[test]
