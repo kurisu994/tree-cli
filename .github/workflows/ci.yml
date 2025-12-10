@@ -97,16 +97,6 @@ jobs:
     - name: Run benchmarks
       run: cargo bench --bench regression_simple
 
-    - name: Store benchmark result
-      uses: benchmark-action/github-action-benchmark@v1
-      with:
-        tool: 'cargo'
-        output-file-path: target/criterion/reports/index.html
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        auto-push: true
-        comment-on-alert: true
-        alert-threshold: '200%'
-        fail-on-alert: true
 
   clippy:
     name: Clippy
