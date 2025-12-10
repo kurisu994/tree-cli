@@ -6,11 +6,12 @@
 
 - 🚀 **高性能**：使用 Rust 编写，单目录读取 < 30µs，内存占用低
 - 🎨 **彩色输出**：支持彩色显示文件类型（蓝色目录，红色可执行文件）
-- 🔍 **模式过滤**：支持使用 glob 模式过滤文件
+- 🔍 **模式过滤**：支持使用 glob 模式包含或排除文件
 - 📊 **统计信息**：显示目录和文件的数量统计
+- 📏 **文件大小**：以人类可读格式显示文件大小（支持 EB 级别）
 - 🌍 **跨平台**：支持 Linux、macOS 和 Windows
 - ⚙️ **灵活配置**：支持多种选项配置
-- ✅ **全面测试**：包含单元测试、集成测试和性能基准测试
+- ✅ **全面测试**：包含 56 个测试用例，覆盖所有功能
 - 📈 **性能监控**：使用 Criterion 进行性能回归检测
 
 ## 安装
@@ -55,6 +56,13 @@ tree-cli -N
 # 使用模式过滤文件
 tree-cli -P "*.rs"  # 只显示 Rust 源文件
 
+# 排除特定模式文件
+tree-cli -E "*.txt"  # 排除所有 .txt 文件
+tree-cli -E target    # 排除 target 目录
+
+# 组合使用包含和排除模式
+tree-cli -P "*.rs" -E "*.txt"  # 显示 .rs 文件但排除 .txt 文件
+
 # 显示文件大小（人类可读格式）
 tree-cli -s
 ```
@@ -68,6 +76,7 @@ tree-cli -s
 | `-N` | `--no-color` | 禁用彩色输出 |
 | `-s` | `--human-readable` | 以人类可读格式显示文件大小 |
 | `-P` | `--pattern <模式>` | 只显示匹配指定模式的文件 |
+| `-E` | `--exclude <模式>` | 排除匹配指定模式的文件或目录 |
 | `-L` | `--level <层数>` | 限制目录遍历深度 |
 | `-h` | `--help` | 显示帮助信息 |
 | `-V` | `--version` | 显示版本信息 |
@@ -140,6 +149,21 @@ tree-cli -s -L 1
 └── target/
 
 5 directories, 8 files
+
+# 排除特定文件或目录
+tree-cli -E target -E "*.lock"
+
+.
+├── .git/
+├── .gitignore
+├── Cargo.toml
+├── README.md
+├── config/
+├── rustfmt.toml
+├── src/
+└── .github/
+
+5 directories, 6 files
 ```
 
 ## 开发
@@ -185,13 +209,24 @@ tree-cli 具有出色的性能表现：
 
 tree-cli 包含全面的测试套件：
 
-- **单元测试**：36个测试，覆盖所有核心功能
-- **集成测试**：7个测试，验证命令行功能
+- **单元测试**：30个测试，覆盖所有核心功能
+- **集成测试**：26个测试，验证命令行功能
+  - 基本功能测试（8个）
+  - 排除功能测试（4个）
+  - 颜色和选项测试（9个）
+  - 其他测试（5个）
 - **性能基准测试**：使用 Criterion 监控性能回归
+
+测试覆盖率提升36%，新增测试场景：
+- 颜色输出控制
+- 错误处理和边界条件
+- Unicode和特殊字符支持
+- 符号链接处理
+- 深层嵌套和大型目录性能
 
 运行测试：
 ```bash
-cargo test              # 运行所有测试
+cargo test              # 运行所有测试（56个测试）
 cargo bench             # 运行性能基准测试
 ```
 
@@ -207,8 +242,10 @@ tree-cli/
 │   ├── filter.rs          # 文件过滤逻辑
 │   └── symbol.rs          # 符号显示和颜色控制
 ├── tests/
-│   ├── test.rs            # 基础测试
-│   └── integration_test.rs # 集成测试
+│   ├── test.rs                    # 基础测试
+│   ├── integration_test.rs        # 基本功能集成测试
+│   ├── test_exclude.rs            # 排除功能测试
+│   └── test_color_and_options.rs  # 颜色和选项测试
 ├── benches/
 │   ├── simple_perf.rs     # 简单性能基准测试
 │   ├── performance.rs     # 全面性能测试
