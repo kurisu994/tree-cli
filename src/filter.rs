@@ -85,6 +85,7 @@ mod tests {
             show_all: false,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let file_iterator = FileIterator::new(temp_dir.path(), &config);
@@ -104,6 +105,7 @@ mod tests {
             show_all: false,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let file_iterator = FileIterator::new(temp_dir.path(), &config);
@@ -129,6 +131,7 @@ mod tests {
             show_all: false,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let file_iterator = FileIterator::new(temp_dir.path(), &config);
@@ -164,6 +167,7 @@ mod tests {
             show_all: false,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let file_iterator = FileIterator::new(temp_dir.path(), &config);
@@ -201,6 +205,7 @@ mod tests {
             show_all: false,
             max_level: 1,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let file_iterator = FileIterator::new(temp_dir.path(), &config);
@@ -232,6 +237,7 @@ mod tests {
             show_all: false,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let file_iterator = FileIterator::new(temp_dir.path(), &config);

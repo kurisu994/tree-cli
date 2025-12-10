@@ -55,6 +55,8 @@ pub struct FileIterator {
     max_level: usize,
     /// 全局匹配器，用于过滤文件
     include_glob: Option<GlobMatcher>,
+    /// 全局匹配器，用于排除文件
+    exclude_glob: Option<GlobMatcher>,
 }
 
 impl FileIterator {
@@ -71,6 +73,7 @@ impl FileIterator {
             max_level: config.max_level,
             show_hidden: config.show_all,
             include_glob: config.include_glob.clone(),
+            exclude_glob: config.exclude_glob.clone(),
         }
     }
 
@@ -82,8 +85,20 @@ impl FileIterator {
         }
     }
 
+    fn is_glob_excluded(&self, file_name: &str) -> bool {
+        if let Some(ref glob) = self.exclude_glob {
+            glob.is_match(file_name)
+        } else {
+            false
+        }
+    }
+
     fn is_included(&self, name: &str, is_dir: bool) -> bool {
         if !self.show_hidden && name.starts_with('.') {
+            return false;
+        }
+        // 首先检查是否被排除
+        if self.is_glob_excluded(name) {
             return false;
         }
         if is_dir {
@@ -189,6 +204,7 @@ mod tests {
             show_all: false,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let iterator = FileIterator::new(temp_dir.path(), &config);
@@ -207,6 +223,7 @@ mod tests {
             show_all: false,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let iterator = FileIterator::new(temp_dir.path(), &config);
@@ -227,6 +244,7 @@ mod tests {
             show_all: false,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
         let iterator = FileIterator::new(temp_dir.path(), &config);
 
@@ -242,6 +260,7 @@ mod tests {
             show_all: true,
             max_level: 2,
             include_glob: None,
+            exclude_glob: None,
         };
         let iterator = FileIterator::new(temp_dir.path(), &config);
 
@@ -263,6 +282,7 @@ mod tests {
             show_all: false,
             max_level: 0, // 不进入子目录
             include_glob: None,
+            exclude_glob: None,
         };
 
         let mut iterator = FileIterator::new(temp_dir.path(), &config);
@@ -292,6 +312,7 @@ mod tests {
             show_all: false,
             max_level: 1, // 允许进入一层子目录
             include_glob: None,
+            exclude_glob: None,
         };
 
         let mut iterator = FileIterator::new(temp_dir.path(), &config);

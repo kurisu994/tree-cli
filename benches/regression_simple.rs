@@ -18,6 +18,7 @@ fn bench_empty_directory(c: &mut Criterion) {
         size: false,
         max_level: 10,
         include_glob: None,
+        exclude_glob: None,
     };
 
     let mut group = c.benchmark_group("回归测试-空目录");
@@ -50,6 +51,7 @@ fn bench_single_level_directory(c: &mut Criterion) {
         size: false,
         max_level: 1,
         include_glob: None,
+        exclude_glob: None,
     };
 
     let mut group = c.benchmark_group("回归测试-单层目录");
@@ -96,6 +98,7 @@ fn bench_deep_directory(c: &mut Criterion) {
         size: false,
         max_level: 5,
         include_glob: None,
+        exclude_glob: None,
     };
 
     let mut group = c.benchmark_group("回归测试-深层目录");
@@ -138,9 +141,10 @@ fn bench_filter_performance(c: &mut Criterion) {
         let config = Config {
             colorful: false,
             show_all: false,
-        size: false,
+            size: false,
             max_level: 1,
             include_glob: None,
+            exclude_glob: None,
         };
         b.iter(|| {
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
@@ -154,9 +158,10 @@ fn bench_filter_performance(c: &mut Criterion) {
         let config = Config {
             colorful: false,
             show_all: false,
-        size: false,
+            size: false,
             max_level: 1,
             include_glob: Some(globset::Glob::new("*.rs").unwrap().compile_matcher()),
+            exclude_glob: None,
         };
         b.iter(|| {
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
@@ -193,9 +198,10 @@ fn bench_depth_limiting(c: &mut Criterion) {
                 let config = Config {
                     colorful: false,
                     show_all: false,
-        size: false,
+                    size: false,
                     max_level: max_depth,
                     include_glob: None,
+                    exclude_glob: None,
                 };
                 b.iter(|| {
                     let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
@@ -232,9 +238,10 @@ fn bench_hidden_files(c: &mut Criterion) {
         let config = Config {
             colorful: false,
             show_all: false,
-        size: false,
+            size: false,
             max_level: 1,
             include_glob: None,
+            exclude_glob: None,
         };
         b.iter(|| {
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
@@ -248,9 +255,10 @@ fn bench_hidden_files(c: &mut Criterion) {
         let config = Config {
             colorful: false,
             show_all: true,
-        size: false,
+            size: false,
             max_level: 1,
             include_glob: None,
+            exclude_glob: None,
         };
         b.iter(|| {
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));

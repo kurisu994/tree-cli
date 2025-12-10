@@ -108,9 +108,10 @@ fn bench_small_directory_traversal(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
-        size: false,
+                size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
+                exclude_glob: None,
             };
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
             let count = iterator.count();
@@ -133,9 +134,10 @@ fn bench_medium_directory_traversal(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
-        size: false,
+                size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
+                exclude_glob: None,
             };
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
             let count = iterator.count();
@@ -161,9 +163,10 @@ fn bench_large_directory_traversal(c: &mut Criterion) {
                     let config = Config {
                         colorful: false,
                         show_all: false,
-        size: false,
+                        size: false,
                         max_level: usize::max_value(),
                         include_glob: None,
+                        exclude_glob: None,
                     };
                     let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
                     let count = iterator.count();
@@ -185,6 +188,7 @@ fn bench_file_iterator(c: &mut Criterion) {
         size: false,
         max_level: usize::max_value(),
         include_glob: None,
+        exclude_glob: None,
     };
 
     let mut group = c.benchmark_group("文件迭代器");
@@ -217,9 +221,10 @@ fn bench_file_filtering(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
-        size: false,
+                size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
+                exclude_glob: None,
             };
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
             let count = iterator.count();
@@ -233,9 +238,10 @@ fn bench_file_filtering(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
-        size: false,
+                size: false,
                 max_level: usize::max_value(),
                 include_glob: Some(globset::Glob::new("*.rs").unwrap().compile_matcher()),
+                exclude_glob: None,
             };
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
             let count = iterator.count();
@@ -249,9 +255,10 @@ fn bench_file_filtering(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: true,
-        size: false,
+                size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
+                exclude_glob: None,
             };
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
             let count = iterator.count();
@@ -276,9 +283,10 @@ fn bench_depth_limiting(c: &mut Criterion) {
                     let config = Config {
                         colorful: false,
                         show_all: false,
-        size: false,
+                        size: false,
                         max_level: max_depth,
                         include_glob: None,
+                        exclude_glob: None,
                     };
                     let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
                     let count = iterator.count();
@@ -303,9 +311,10 @@ fn bench_memory_usage(c: &mut Criterion) {
             let config = Config {
                 colorful: false,
                 show_all: false,
-        size: false,
+                size: false,
                 max_level: usize::max_value(),
                 include_glob: None,
+                exclude_glob: None,
             };
             let iterator = FileIterator::new(black_box(temp_dir.path()), black_box(&config));
             let count = iterator.count();

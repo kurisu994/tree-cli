@@ -33,6 +33,9 @@ struct Args {
     /// List only those files matching <include_pattern>
     #[arg(short = 'P', long = "pattern")]
     include_pattern: Option<String>,
+    /// Exclude those files matching <exclude_pattern>
+    #[arg(short = 'I', long = "exclude")]
+    exclude_pattern: Option<String>,
     /// Descend only <level> directories deep
     #[arg(short = 'L', long = "level", default_value_t = usize::max_value())]
     max_level: usize,
@@ -46,6 +49,7 @@ fn main() {
         size,
         dir,
         include_pattern,
+        exclude_pattern,
         max_level,
     } = Args::parse();
     let path = Path::new(&dir);
@@ -58,6 +62,11 @@ fn main() {
         include_glob: include_pattern.map(|pat| {
             Glob::new(pat.as_str())
                 .expect("include_pattern is not valid")
+                .compile_matcher()
+        }),
+        exclude_glob: exclude_pattern.map(|pat| {
+            Glob::new(pat.as_str())
+                .expect("exclude_pattern is not valid")
                 .compile_matcher()
         }),
     };

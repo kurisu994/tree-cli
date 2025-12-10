@@ -222,6 +222,7 @@ mod tests {
             show_all: false,
             max_level: 1,
             include_glob: None,
+            exclude_glob: None,
         };
 
         // 注意：这个测试可能需要在有终端支持的环境中运行
@@ -240,6 +241,7 @@ mod tests {
             show_all: false,
             max_level: 1,
             include_glob: None,
+            exclude_glob: None,
         };
 
         if let Some(terminal) = term::stdout() {
@@ -291,6 +293,7 @@ mod tests {
             show_all: false,
             max_level: 1,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let temp_dir = TempDir::new().unwrap();
@@ -310,6 +313,7 @@ mod tests {
             show_all: false,
             max_level: 1,
             include_glob: None,
+            exclude_glob: None,
         };
 
         let temp_dir = TempDir::new().unwrap();

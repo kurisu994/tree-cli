@@ -22,6 +22,8 @@ pub struct Config {
     pub max_level: usize,
     /// 文件过滤模式
     pub include_glob: Option<GlobMatcher>,
+    /// 文件排除模式
+    pub exclude_glob: Option<GlobMatcher>,
 }
 
 /// 目录树生成器，负责将文件系统结构转换为可视化的树形图
@@ -118,12 +120,14 @@ mod tests {
             size: false,
             max_level: 3,
             include_glob: None,
+            exclude_glob: None,
         };
         assert!(config.colorful);
         assert!(!config.show_all);
         assert!(!config.size);
         assert_eq!(config.max_level, 3);
         assert!(config.include_glob.is_none());
+        assert!(config.exclude_glob.is_none());
     }
 
     #[test]
