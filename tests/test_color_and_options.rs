@@ -14,14 +14,14 @@ fn test_color_output() {
 
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
 
     // 测试强制启用颜色 (-C)
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-C", temp_dir.path().to_str().unwrap()])
+        .args(["-C", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -33,7 +33,7 @@ fn test_color_output() {
 
     // 测试禁用颜色 (-N)
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-N", temp_dir.path().to_str().unwrap()])
+        .args(["-N", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -62,20 +62,22 @@ fn test_multiple_parameters() {
 
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
 
     // 测试组合多个参数：显示所有文件 + 限制深度 + 显示大小 + 只显示txt文件
     let output = Command::new("./target/release/tree-cli")
-        .args(&[
-            "-a",                    // 显示所有文件
-            "-L", "2",              // 限制深度为2
-            "-s",                   // 显示文件大小
-            "-P", "*.txt",          // 只显示txt文件
-            "-C",                   // 启用颜色
-            temp_dir.path().to_str().unwrap()
+        .args([
+            "-a", // 显示所有文件
+            "-L",
+            "2",  // 限制深度为2
+            "-s", // 显示文件大小
+            "-P",
+            "*.txt", // 只显示txt文件
+            "-C",    // 启用颜色
+            temp_dir.path().to_str().unwrap(),
         ])
         .output()
         .expect("Failed to execute tree-cli");
@@ -84,12 +86,12 @@ fn test_multiple_parameters() {
     let stdout = String::from_utf8(output.stdout).unwrap();
 
     // 验证所有参数都生效了
-    assert!(stdout.contains("file1.txt"));  // 显示的文件
-    assert!(stdout.contains("file3.txt"));  // 显示的文件
-    assert!(!stdout.contains("file2.rs"));  // 被过滤掉的文件（不是.txt）
-    assert!(!stdout.contains("level2"));    // 超出深度限制
-    assert!(stdout.contains("[") || stdout.contains("B"));  // 包含大小信息
-    assert!(stdout.contains("\x1b["));      // 包含颜色代码
+    assert!(stdout.contains("file1.txt")); // 显示的文件
+    assert!(stdout.contains("file3.txt")); // 显示的文件
+    assert!(!stdout.contains("file2.rs")); // 被过滤掉的文件（不是.txt）
+    assert!(!stdout.contains("level2")); // 超出深度限制
+    assert!(stdout.contains("[") || stdout.contains("B")); // 包含大小信息
+    assert!(stdout.contains("\x1b[")); // 包含颜色代码
 
     // 注意：.hidden 文件不会被显示，因为它不是 .txt 文件（被 -P 过滤了）
 }
@@ -99,7 +101,7 @@ fn test_multiple_parameters() {
 fn test_error_handling() {
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -115,11 +117,13 @@ fn test_error_handling() {
     let stderr = String::from_utf8_lossy(&output.stderr);
 
     // 检查是否显示了错误信息或0个文件
-    assert!(stdout.contains("Error") ||
+    assert!(
+        stdout.contains("Error") ||
             stdout.contains("0 files") ||
             stderr.contains("Error") ||
             stdout.contains("directories") || // 至少应该输出目录统计
-            output.status.success()); // 或者程序正常退出但显示空结果
+            output.status.success()
+    ); // 或者程序正常退出但显示空结果
 
     // 测试空字符串路径（在某些系统上可能触发错误）
     #[cfg(unix)]
@@ -141,11 +145,12 @@ fn test_special_characters_and_unicode() {
 
     // 创建包含特殊字符和Unicode的文件名
     // 使用Vec来避免&str生命周期问题
-    let mut special_files = Vec::new();
-    special_files.push("文件.txt".to_string());           // 中文
-    special_files.push("файл.rs".to_string());            // 俄文
-    special_files.push("🦀 rustacean.py".to_string());   // Emoji
-    special_files.push("file with spaces.txt".to_string()); // 空格
+    let mut special_files = vec![
+        "文件.txt".to_string(),             // 中文
+        "файл.rs".to_string(),              // 俄文
+        "🦀 rustacean.py".to_string(),      // Emoji
+        "file with spaces.txt".to_string(), // 空格
+    ];
 
     // 添加长文件名
     let long_filename = "a".repeat(100); // 使用100个字符，避免某些文件系统限制
@@ -177,14 +182,14 @@ fn test_special_characters_and_unicode() {
 
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
 
     // 测试程序能否正确处理这些文件名
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-a", temp_dir.path().to_str().unwrap()])
+        .args(["-a", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -193,9 +198,7 @@ fn test_special_characters_and_unicode() {
 
     // 验证能处理一些特殊文件名
     // 检查常见的Unicode字符
-    let found_unicode = stdout.contains("文件.txt") ||
-                       stdout.contains("файл.rs") ||
-                       stdout.contains("🦀");
+    let found_unicode = stdout.contains("文件.txt") || stdout.contains("файл.rs") || stdout.contains("🦀");
 
     // 检查空格文件名
     let found_spaces = stdout.contains("file with spaces.txt");
@@ -204,8 +207,11 @@ fn test_special_characters_and_unicode() {
     let found_long = stdout.lines().any(|line| line.contains("aaaaa"));
 
     // 至少应该找到一种特殊文件名
-    assert!(found_unicode || found_spaces || found_long,
-            "No special character files found in output. Output:\n{}", stdout);
+    assert!(
+        found_unicode || found_spaces || found_long,
+        "No special character files found in output. Output:\n{}",
+        stdout
+    );
 }
 
 /// 测试深层嵌套目录
@@ -223,7 +229,7 @@ fn test_deep_nested_directories() {
 
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -243,7 +249,7 @@ fn test_deep_nested_directories() {
 
     // 限制深度为10
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-L", "10", temp_dir.path().to_str().unwrap()])
+        .args(["-L", "10", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -269,22 +275,30 @@ fn test_symlink_handling() {
     fs::write(temp_dir.path().join("original_file.txt"), "original content").unwrap();
 
     // 创建符号链接
-    symlink(temp_dir.path().join("original_dir"), temp_dir.path().join("link_to_dir")).unwrap();
-    symlink(temp_dir.path().join("original_file.txt"), temp_dir.path().join("link_to_file")).unwrap();
+    symlink(
+        temp_dir.path().join("original_dir"),
+        temp_dir.path().join("link_to_dir"),
+    )
+    .unwrap();
+    symlink(
+        temp_dir.path().join("original_file.txt"),
+        temp_dir.path().join("link_to_file"),
+    )
+    .unwrap();
 
     // 创建指向不存在的文件的符号链接
     symlink(temp_dir.path().join("nonexistent"), temp_dir.path().join("broken_link")).unwrap();
 
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
 
     // 测试符号链接显示
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-a", temp_dir.path().to_str().unwrap()])
+        .args(["-a", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -307,7 +321,7 @@ fn test_large_directory_performance() {
 
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -345,7 +359,7 @@ fn test_exclude_short_option() {
 
     // 测试使用 -E 选项排除所有 .txt 文件
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-E", "*.txt", temp_dir.path().to_str().unwrap()])
+        .args(["-E", "*.txt", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -363,7 +377,7 @@ fn test_exclude_short_option() {
 fn test_edge_cases_paths() {
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -372,7 +386,7 @@ fn test_edge_cases_paths() {
     #[cfg(unix)]
     {
         let output = Command::new("./target/release/tree-cli")
-            .args(&["-L", "1", "/"])  // 限制深度避免扫描整个文件系统
+            .args(["-L", "1", "/"]) // 限制深度避免扫描整个文件系统
             .output()
             .expect("Failed to execute tree-cli");
 
@@ -383,7 +397,7 @@ fn test_edge_cases_paths() {
 
     // 测试当前目录（.）
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-L", "1", "."])
+        .args(["-L", "1", "."])
         .output()
         .expect("Failed to execute tree-cli");
 

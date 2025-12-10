@@ -101,11 +101,7 @@ impl FileIterator {
         if self.is_glob_excluded(name) {
             return false;
         }
-        if is_dir {
-            true
-        } else {
-            self.is_glob_included(name)
-        }
+        if is_dir { true } else { self.is_glob_included(name) }
     }
 
     fn push_dir(&mut self, item: &FileItem) {
@@ -160,9 +156,9 @@ impl Iterator for FileIterator {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
     use std::path::PathBuf;
     use tempfile::TempDir;
-    use std::fs;
 
     #[test]
     fn test_file_item_creation() {
@@ -285,10 +281,10 @@ mod tests {
             exclude_glob: None,
         };
 
-        let mut iterator = FileIterator::new(temp_dir.path(), &config);
+        let iterator = FileIterator::new(temp_dir.path(), &config);
         let mut items = Vec::new();
 
-        while let Some(item) = iterator.next() {
+        for item in iterator {
             items.push(item);
         }
 
@@ -315,10 +311,10 @@ mod tests {
             exclude_glob: None,
         };
 
-        let mut iterator = FileIterator::new(temp_dir.path(), &config);
+        let iterator = FileIterator::new(temp_dir.path(), &config);
         let mut items = Vec::new();
 
-        while let Some(item) = iterator.next() {
+        for item in iterator {
             items.push(item);
         }
 

@@ -100,12 +100,7 @@ pub fn print_path(
     Ok(())
 }
 
-fn write_color(
-    t: &mut Box<term::StdoutTerminal>,
-    config: &Config,
-    color: color::Color,
-    str: &str,
-) -> io::Result<()> {
+fn write_color(t: &mut Box<term::StdoutTerminal>, config: &Config, color: color::Color, str: &str) -> io::Result<()> {
     if config.colorful {
         t.fg(color)?;
     }
@@ -139,9 +134,9 @@ fn is_executable(metadata: &Metadata) -> bool {
 mod tests {
     use super::*;
     use std::fs;
-    use tempfile::TempDir;
     #[cfg(any(target_os = "macos", target_os = "linux"))]
     use std::os::unix::fs::PermissionsExt;
+    use tempfile::TempDir;
 
     #[test]
     fn test_format_human_readable_size() {
@@ -186,7 +181,7 @@ mod tests {
 
         // 测试特殊边界值
         assert_eq!(format_human_readable_size(10239), "10.0KB"); // 四舍五入到10.0KB
-        assert_eq!(format_human_readable_size(10240), "10KB");  // 整好10KB
+        assert_eq!(format_human_readable_size(10240), "10KB"); // 整好10KB
     }
 
     #[test]

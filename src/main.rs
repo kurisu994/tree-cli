@@ -3,13 +3,13 @@
 //! 这是一个跨平台的命令行工具，用于以树形结构显示目录内容。
 //! 它是 Unix `tree` 命令的轻量级替代方案。
 
-use std::path::Path;
 use std::io::Write;
+use std::path::Path;
 
 use clap::Parser;
 use globset::Glob;
 
-use tree_cli::core::{DirSummary, DirTree, Config};
+use tree_cli::core::{Config, DirSummary, DirTree};
 
 /// 高性能目录树显示工具
 #[derive(Parser, Debug)]
@@ -37,7 +37,7 @@ struct Args {
     #[arg(short = 'E', long = "exclude")]
     exclude_pattern: Option<String>,
     /// Descend only <level> directories deep
-    #[arg(short = 'L', long = "level", default_value_t = usize::max_value())]
+    #[arg(short = 'L', long = "level", default_value_t = usize::MAX)]
     max_level: usize,
 }
 
@@ -71,10 +71,7 @@ fn main() {
         }),
     };
     let mut dir_tree = DirTree::new(config, &mut mt);
-    let DirSummary {
-        num_folders,
-        num_files,
-    } = dir_tree.print_folders(path).expect("execution failure");
+    let DirSummary { num_folders, num_files } = dir_tree.print_folders(path).expect("execution failure");
 
     writeln!(mt, "\n{} directories, {} files", num_folders, num_files).unwrap()
 }

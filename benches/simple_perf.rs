@@ -2,7 +2,7 @@
 //!
 //! 专注于测试核心功能的性能
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
+use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
 use std::fs;
 use std::path::Path;
 use std::time::Duration;
@@ -39,25 +39,15 @@ fn create_test_directory(depth: usize, files_per_dir: usize) -> TempDir {
 fn bench_filesystem_reading(c: &mut Criterion) {
     let mut group = c.benchmark_group("文件系统读取性能");
 
-    for (size, depth, files) in [
-        ("小", 2, 10),
-        ("中", 3, 20),
-        ("大", 4, 30),
-    ].iter() {
+    for (size, depth, files) in [("小", 2, 10), ("中", 3, 20), ("大", 4, 30)].iter() {
         let temp_dir = create_test_directory(*depth, *files);
 
-        group.bench_with_input(
-            BenchmarkId::new("读取目录", size),
-            &(temp_dir.path()),
-            |b, path| {
-                b.iter(|| {
-                    let count = fs::read_dir(black_box(path))
-                        .expect("无法读取目录")
-                        .count();
-                    black_box(count);
-                });
-            },
-        );
+        group.bench_with_input(BenchmarkId::new("读取目录", size), &(temp_dir.path()), |b, path| {
+            b.iter(|| {
+                let count = fs::read_dir(black_box(path)).expect("无法读取目录").count();
+                black_box(count);
+            });
+        });
     }
 
     group.finish();

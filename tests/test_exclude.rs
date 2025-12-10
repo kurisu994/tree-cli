@@ -1,7 +1,7 @@
 //! 测试 exclude 功能的集成测试
 
-use assert_cmd::Command;
 use std::fs;
+use std::process::Command;
 use tempfile::TempDir;
 
 #[test]
@@ -20,9 +20,8 @@ fn test_exclude_with_pattern() {
     fs::write(temp_dir.path().join("subdir/file4.rs"), "content4").unwrap();
 
     // 测试排除所有 .txt 文件
-    let mut cmd = Command::cargo_bin("tree-cli").unwrap();
-    cmd.current_dir(temp_dir.path())
-       .args(["--exclude", "*.txt"]);
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"));
+    cmd.current_dir(temp_dir.path()).args(["--exclude", "*.txt"]);
 
     let output = cmd.output().unwrap();
     let stdout = String::from_utf8(output.stdout).unwrap();
@@ -46,9 +45,8 @@ fn test_exclude_single_pattern() {
     fs::write(temp_dir.path().join("target.exe"), "executable").unwrap();
 
     // 测试排除 .txt 文件
-    let mut cmd = Command::cargo_bin("tree-cli").unwrap();
-    cmd.current_dir(temp_dir.path())
-       .args(["--exclude", "*.txt"]);
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"));
+    cmd.current_dir(temp_dir.path()).args(["--exclude", "*.txt"]);
 
     let output = cmd.output().unwrap();
     let stdout = String::from_utf8(output.stdout).unwrap();
@@ -73,9 +71,8 @@ fn test_exclude_directories() {
     fs::write(temp_dir.path().join("src/main.rs"), "main").unwrap();
 
     // 测试排除 target 目录
-    let mut cmd = Command::cargo_bin("tree-cli").unwrap();
-    cmd.current_dir(temp_dir.path())
-       .args(["--exclude", "target"]);
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"));
+    cmd.current_dir(temp_dir.path()).args(["--exclude", "target"]);
 
     let output = cmd.output().unwrap();
     let stdout = String::from_utf8(output.stdout).unwrap();
@@ -98,10 +95,10 @@ fn test_exclude_with_include() {
     fs::write(temp_dir.path().join("file4.py"), "python").unwrap();
 
     // 测试同时使用 include 和 exclude - include 只用单个模式
-    let mut cmd = Command::cargo_bin("tree-cli").unwrap();
+    let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("tree-cli"));
     cmd.current_dir(temp_dir.path())
-       .args(["--pattern", "*.rs"])
-       .args(["--exclude", "*.py"]);
+        .args(["--pattern", "*.rs"])
+        .args(["--exclude", "*.py"]);
 
     let output = cmd.output().unwrap();
     let stdout = String::from_utf8(output.stdout).unwrap();

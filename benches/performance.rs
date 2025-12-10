@@ -6,12 +6,12 @@
 //! - 内存使用分析
 //! - 大目录处理能力
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
+use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
 use std::fs;
 use std::path::Path;
 use std::time::Duration;
 use tempfile::TempDir;
-use tree_cli::core::{Config};
+use tree_cli::core::Config;
 use tree_cli::file_iterator::FileIterator;
 
 /// 创建测试目录结构
@@ -42,6 +42,7 @@ fn create_test_directory(depth: usize, files_per_dir: usize) -> TempDir {
 }
 
 /// 创建带隐藏文件的测试目录
+#[allow(dead_code)]
 fn create_test_directory_with_hidden() -> TempDir {
     let temp_dir = TempDir::new().expect("无法创建临时目录");
 
@@ -92,6 +93,7 @@ fn create_test_directory_with_various_file_types() -> TempDir {
 }
 
 /// 创建模拟终端输出
+#[allow(dead_code)]
 fn create_mock_terminal() -> Box<dyn std::io::Write> {
     Box::new(Vec::new())
 }
@@ -109,7 +111,7 @@ fn bench_small_directory_traversal(c: &mut Criterion) {
                 colorful: false,
                 show_all: false,
                 size: false,
-                max_level: usize::max_value(),
+                max_level: usize::MAX,
                 include_glob: None,
                 exclude_glob: None,
             };
@@ -135,7 +137,7 @@ fn bench_medium_directory_traversal(c: &mut Criterion) {
                 colorful: false,
                 show_all: false,
                 size: false,
-                max_level: usize::max_value(),
+                max_level: usize::MAX,
                 include_glob: None,
                 exclude_glob: None,
             };
@@ -164,7 +166,7 @@ fn bench_large_directory_traversal(c: &mut Criterion) {
                         colorful: false,
                         show_all: false,
                         size: false,
-                        max_level: usize::max_value(),
+                        max_level: usize::MAX,
                         include_glob: None,
                         exclude_glob: None,
                     };
@@ -186,7 +188,7 @@ fn bench_file_iterator(c: &mut Criterion) {
         colorful: false,
         show_all: false,
         size: false,
-        max_level: usize::max_value(),
+        max_level: usize::MAX,
         include_glob: None,
         exclude_glob: None,
     };
@@ -222,7 +224,7 @@ fn bench_file_filtering(c: &mut Criterion) {
                 colorful: false,
                 show_all: false,
                 size: false,
-                max_level: usize::max_value(),
+                max_level: usize::MAX,
                 include_glob: None,
                 exclude_glob: None,
             };
@@ -239,7 +241,7 @@ fn bench_file_filtering(c: &mut Criterion) {
                 colorful: false,
                 show_all: false,
                 size: false,
-                max_level: usize::max_value(),
+                max_level: usize::MAX,
                 include_glob: Some(globset::Glob::new("*.rs").unwrap().compile_matcher()),
                 exclude_glob: None,
             };
@@ -256,7 +258,7 @@ fn bench_file_filtering(c: &mut Criterion) {
                 colorful: false,
                 show_all: true,
                 size: false,
-                max_level: usize::max_value(),
+                max_level: usize::MAX,
                 include_glob: None,
                 exclude_glob: None,
             };
@@ -312,7 +314,7 @@ fn bench_memory_usage(c: &mut Criterion) {
                 colorful: false,
                 show_all: false,
                 size: false,
-                max_level: usize::max_value(),
+                max_level: usize::MAX,
                 include_glob: None,
                 exclude_glob: None,
             };

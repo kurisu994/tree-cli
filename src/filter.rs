@@ -171,10 +171,10 @@ mod tests {
         };
 
         let file_iterator = FileIterator::new(temp_dir.path(), &config);
-        let mut filtered_iterator = FilteredIterator::new(file_iterator);
+        let filtered_iterator = FilteredIterator::new(file_iterator);
 
         let mut items = Vec::new();
-        while let Some(item) = filtered_iterator.next() {
+        for item in filtered_iterator {
             items.push(item);
         }
 
@@ -213,7 +213,7 @@ mod tests {
         filtered_iterator.skip_filter();
 
         let mut items = Vec::new();
-        while let Some(item) = filtered_iterator.next() {
+        for item in filtered_iterator {
             items.push(item);
         }
 
@@ -241,15 +241,16 @@ mod tests {
         };
 
         let file_iterator = FileIterator::new(temp_dir.path(), &config);
-        let mut filtered_iterator = FilteredIterator::new(file_iterator);
+        let filtered_iterator = FilteredIterator::new(file_iterator);
 
         let mut items = Vec::new();
-        while let Some(item) = filtered_iterator.next() {
+        for item in filtered_iterator {
             items.push(item);
         }
 
         // 过滤器应该正确处理空目录和非空目录
-        let dir_names: Vec<String> = items.iter()
+        let dir_names: Vec<String> = items
+            .iter()
             .filter(|i| i.is_dir())
             .map(|i| i.file_name.clone())
             .collect();

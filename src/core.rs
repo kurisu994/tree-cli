@@ -2,9 +2,9 @@
 //!
 //! 该模块负责生成和显示目录树结构，包括文件统计和格式化输出。
 
+use globset::GlobMatcher;
 use std::io;
 use std::path::Path;
-use globset::GlobMatcher;
 
 use crate::file_iterator::{FileItem, FileIterator};
 use crate::filter::FilteredIterator;

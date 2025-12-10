@@ -2,12 +2,12 @@
 //!
 //! 只测试核心功能，不依赖终端输出
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use std::fs;
 use std::time::Duration;
 use tempfile::TempDir;
-use tree_cli::file_iterator::FileIterator;
 use tree_cli::core::Config;
+use tree_cli::file_iterator::FileIterator;
 
 /// 基准测试：空目录遍历
 fn bench_empty_directory(c: &mut Criterion) {
@@ -83,8 +83,7 @@ fn bench_deep_directory(c: &mut Criterion) {
         // 在当前层创建5个文件
         for i in 0..5 {
             let file_path = current_dir.join(format!("file_{:03}.txt", i));
-            fs::write(file_path, format!("Content at depth {}", current_depth))
-                .expect("无法创建文件");
+            fs::write(file_path, format!("Content at depth {}", current_depth)).expect("无法创建文件");
         }
 
         create_deep_structure(path, depth, current_depth + 1);

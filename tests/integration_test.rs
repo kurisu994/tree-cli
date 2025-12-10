@@ -14,7 +14,7 @@ fn test_basic_tree_display() {
 
     // 先编译程序
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
 
@@ -48,7 +48,7 @@ fn test_show_all_files() {
 
     // 确保程序已编译
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -65,7 +65,7 @@ fn test_show_all_files() {
 
     // 使用 -a 选项
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-a", temp_dir.path().to_str().unwrap()])
+        .args(["-a", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -85,7 +85,7 @@ fn test_level_limit() {
 
     // 确保程序已编译
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -104,7 +104,7 @@ fn test_level_limit() {
 
     // 限制深度为 2
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-L", "2", temp_dir.path().to_str().unwrap()])
+        .args(["-L", "2", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -127,14 +127,14 @@ fn test_pattern_filter() {
 
     // 确保程序已编译
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
 
     // 过滤 Rust 文件
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-P", "*.rs", temp_dir.path().to_str().unwrap()])
+        .args(["-P", "*.rs", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
@@ -149,7 +149,7 @@ fn test_pattern_filter() {
 fn test_help_option() {
     // 确保程序已编译
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -172,7 +172,7 @@ fn test_help_option() {
 fn test_version_option() {
     // 确保程序已编译
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -195,7 +195,7 @@ fn test_empty_directory() {
 
     // 确保程序已编译
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -224,7 +224,7 @@ fn test_human_readable_size() {
 
     // 确保程序已编译
     let compile_output = Command::new("cargo")
-        .args(&["build", "--release"])
+        .args(["build", "--release"])
         .output()
         .expect("Failed to compile tree-cli");
     assert!(compile_output.status.success());
@@ -241,7 +241,7 @@ fn test_human_readable_size() {
 
     // 使用 -s 选项
     let output = Command::new("./target/release/tree-cli")
-        .args(&["-s", temp_dir.path().to_str().unwrap()])
+        .args(["-s", temp_dir.path().to_str().unwrap()])
         .output()
         .expect("Failed to execute tree-cli");
 
