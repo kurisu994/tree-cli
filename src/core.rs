@@ -3,17 +3,15 @@
 //! 该模块负责生成和显示目录树结构，包括文件统计和格式化输出。
 
 use globset::GlobMatcher;
-use std::io;
+use std::io::{self, Write};
 use std::path::Path;
 
 use crate::file_iterator::{FileItem, FileIterator};
 use crate::filter::FilteredIterator;
-use crate::symbol::{print_path, set_line_prefix};
+use crate::symbol::{print_path, sanitize_file_name, set_line_prefix};
 
 /// 应用程序配置选项
 pub struct Config {
-    /// 是否启用彩色输出
-    pub colorful: bool,
     /// 是否显示隐藏文件
     pub show_all: bool,
     /// 是否显示文件大小
@@ -27,16 +25,16 @@ pub struct Config {
 }
 
 /// 目录树生成器，负责将文件系统结构转换为可视化的树形图
-pub struct DirTree<'a> {
-    /// 终端输出对象，用于彩色输出
-    term: &'a mut Box<term::StdoutTerminal>,
+pub struct DirTree<'a, W: Write> {
+    /// 输出目标，所有内容（前缀、文件名、颜色）统一写入此处
+    out: &'a mut W,
     /// 配置选项
     config: Config,
 }
 
-impl<'a> DirTree<'a> {
-    pub fn new(config: Config, term: &'a mut Box<term::StdoutTerminal>) -> DirTree<'a> {
-        DirTree { config, term }
+impl<'a, W: Write> DirTree<'a, W> {
+    pub fn new(config: Config, out: &'a mut W) -> DirTree<'a, W> {
+        DirTree { config, out }
     }
     pub fn print_folders(&mut self, path: &Path) -> io::Result<DirSummary> {
         let mut summary = DirSummary::init();
@@ -83,13 +81,13 @@ impl<'a> DirTree<'a> {
     }
 
     fn print_line(&mut self, entry: &FileItem, prefix: &str) -> io::Result<()> {
-        print!("{}", prefix);
+        write!(self.out, "{}", prefix)?;
         if let Ok(ref metadata) = entry.metadata {
-            print_path(&entry.file_name, metadata, self.term, &self.config)?;
+            print_path(&entry.file_name, metadata, self.out, &self.config)?;
         } else {
-            print!("{} [Error File]", entry.file_name);
+            write!(self.out, "{} [Error File]", sanitize_file_name(&entry.file_name))?;
         }
-        println!();
+        writeln!(self.out)?;
         Ok(())
     }
 }
@@ -115,14 +113,12 @@ mod tests {
     #[test]
     fn test_config_creation() {
         let config = Config {
-            colorful: true,
             show_all: false,
             size: false,
             max_level: 3,
             include_glob: None,
             exclude_glob: None,
         };
-        assert!(config.colorful);
         assert!(!config.show_all);
         assert!(!config.size);
         assert_eq!(config.max_level, 3);

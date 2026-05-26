@@ -108,7 +108,6 @@ fn bench_small_directory_traversal(c: &mut Criterion) {
     group.bench_function("遍历2层深度目录", |b| {
         b.iter(|| {
             let config = Config {
-                colorful: false,
                 show_all: false,
                 size: false,
                 max_level: usize::MAX,
@@ -134,7 +133,6 @@ fn bench_medium_directory_traversal(c: &mut Criterion) {
     group.bench_function("遍历3层深度目录", |b| {
         b.iter(|| {
             let config = Config {
-                colorful: false,
                 show_all: false,
                 size: false,
                 max_level: usize::MAX,
@@ -163,7 +161,6 @@ fn bench_large_directory_traversal(c: &mut Criterion) {
             |b, _| {
                 b.iter(|| {
                     let config = Config {
-                        colorful: false,
                         show_all: false,
                         size: false,
                         max_level: usize::MAX,
@@ -185,7 +182,6 @@ fn bench_large_directory_traversal(c: &mut Criterion) {
 fn bench_file_iterator(c: &mut Criterion) {
     let temp_dir = create_test_directory(3, 30);
     let config = Config {
-        colorful: false,
         show_all: false,
         size: false,
         max_level: usize::MAX,
@@ -221,7 +217,6 @@ fn bench_file_filtering(c: &mut Criterion) {
     group.bench_function("无过滤遍历", |b| {
         b.iter(|| {
             let config = Config {
-                colorful: false,
                 show_all: false,
                 size: false,
                 max_level: usize::MAX,
@@ -238,7 +233,6 @@ fn bench_file_filtering(c: &mut Criterion) {
     group.bench_function("模式匹配过滤 (*.rs)", |b| {
         b.iter(|| {
             let config = Config {
-                colorful: false,
                 show_all: false,
                 size: false,
                 max_level: usize::MAX,
@@ -255,7 +249,6 @@ fn bench_file_filtering(c: &mut Criterion) {
     group.bench_function("隐藏文件过滤", |b| {
         b.iter(|| {
             let config = Config {
-                colorful: false,
                 show_all: true,
                 size: false,
                 max_level: usize::MAX,
@@ -283,7 +276,6 @@ fn bench_depth_limiting(c: &mut Criterion) {
             |b, &max_depth| {
                 b.iter(|| {
                     let config = Config {
-                        colorful: false,
                         show_all: false,
                         size: false,
                         max_level: max_depth,
@@ -311,7 +303,6 @@ fn bench_memory_usage(c: &mut Criterion) {
     group.bench_function("处理大型目录", |b| {
         b.iter(|| {
             let config = Config {
-                colorful: false,
                 show_all: false,
                 size: false,
                 max_level: usize::MAX,

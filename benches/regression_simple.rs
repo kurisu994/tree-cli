@@ -13,7 +13,6 @@ use tree_cli::file_iterator::FileIterator;
 fn bench_empty_directory(c: &mut Criterion) {
     let temp_dir = TempDir::new().expect("无法创建临时目录");
     let config = Config {
-        colorful: false,
         show_all: false,
         size: false,
         max_level: 10,
@@ -46,7 +45,6 @@ fn bench_single_level_directory(c: &mut Criterion) {
     }
 
     let config = Config {
-        colorful: false,
         show_all: false,
         size: false,
         max_level: 1,
@@ -92,7 +90,6 @@ fn bench_deep_directory(c: &mut Criterion) {
     create_deep_structure(&temp_dir, 5, 0);
 
     let config = Config {
-        colorful: false,
         show_all: false,
         size: false,
         max_level: 5,
@@ -138,7 +135,6 @@ fn bench_filter_performance(c: &mut Criterion) {
     // 测试无过滤
     group.bench_function("无过滤", |b| {
         let config = Config {
-            colorful: false,
             show_all: false,
             size: false,
             max_level: 1,
@@ -155,7 +151,6 @@ fn bench_filter_performance(c: &mut Criterion) {
     // 测试 glob 过滤
     group.bench_function("Glob过滤 (*.rs)", |b| {
         let config = Config {
-            colorful: false,
             show_all: false,
             size: false,
             max_level: 1,
@@ -195,7 +190,6 @@ fn bench_depth_limiting(c: &mut Criterion) {
             max_depth,
             |b, &max_depth| {
                 let config = Config {
-                    colorful: false,
                     show_all: false,
                     size: false,
                     max_level: max_depth,
@@ -235,7 +229,6 @@ fn bench_hidden_files(c: &mut Criterion) {
     // 不显示隐藏文件
     group.bench_function("不显示隐藏文件", |b| {
         let config = Config {
-            colorful: false,
             show_all: false,
             size: false,
             max_level: 1,
@@ -252,7 +245,6 @@ fn bench_hidden_files(c: &mut Criterion) {
     // 显示隐藏文件
     group.bench_function("显示隐藏文件", |b| {
         let config = Config {
-            colorful: false,
             show_all: true,
             size: false,
             max_level: 1,

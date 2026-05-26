@@ -14,7 +14,7 @@ tree-cli 是一个用 Rust 编写的高性能跨平台命令行工具，用于�
 - **core.rs**: 核心逻辑，包含 `Config` 和 `DirTree` 结构体，负责目录树的生成和显示
 - **file_iterator.rs**: 文件系统遍历实现，使用 `FileIterator` 进行广度优先遍历
 - **filter.rs**: 文件过滤逻辑，支持 glob 模式匹配和空目录过滤
-- **symbol.rs**: 树形结构的符号定义和彩色输出控制
+- **symbol.rs**: 树形结构的符号定义、ANSI 彩色输出，以及文件名控制字符过滤（防终端转义注入）
 
 ### 关键设计模式
 
@@ -78,20 +78,18 @@ cargo install --git https://github.com/kurisu994/tree-cli.git  # 从 GitHub 安�
 
 项目包含全面的测试套件：
 
-### 单元测试（36个测试）
+### 单元测试（30个测试）
 - **core.rs**: 测试配置结构、符号切换逻辑和目录摘要
 - **file_iterator.rs**: 测试文件迭代、目录遍历、隐藏文件过滤
 - **filter.rs**: 测试过滤逻辑、空目录处理、缓存机制
-- **symbol.rs**: 测试符号生成、颜色输出、可执行文件检测
+- **symbol.rs**: 测试符号生成、颜色输出、可执行文件检测、文件名控制字符过滤
 
-### 集成测试（7个测试）
-- **tests/integration_test.rs**: 验证命令行功能
-  - 基本目录树显示
-  - 隐藏文件选项 (-a)
-  - 深度限制 (-L)
-  - 模式过滤 (-P)
-  - 帮助和版本信息
-  - 空目录处理
+### 集成测试（22个测试）
+分布在 4 个测试文件，均通过 `assert_cmd` 调用编译后的二进制进行验证：
+- **tests/integration_test.rs**（8个）: 基本命令行功能（目录树显示、`-a` 隐藏文件、`-L` 深度限制、`-P` 模式过滤、帮助与版本、空目录处理）
+- **tests/test_color_and_options.rs**（9个）: 颜色输出、多参数组合、错误处理、特殊字符与 Unicode、深层嵌套、符号链接处理、大目录性能、路径边界
+- **tests/test_exclude.rs**（4个）: `-E` 排除模式（单一 / 多重 / 目录 / 与 include 组合）
+- **tests/test.rs**（1个）: 基础冒烟测试
 
 ### 性能基准测试
 - **benches/performance.rs**: 全面的性能测试
@@ -126,13 +124,13 @@ cargo bench --bench regression_simple  # 运行回归测试（用于 CI/CD）
 ### 主要依赖
 - `clap 4.5`: 命令行参数解析，支持 derive 特性
 - `globset 0.4`: 文件模式匹配，支持 glob 表达式
-- `term 0.7`: 终端控制和彩色输出
+- `anstyle 1.0`: ANSI 文本样式定义（颜色、加粗等），无 I/O
+- `anstream 1.0`: 包裹 stdout，按 `ColorChoice`（是否 TTY、`--color`/`--no-color`、`NO_COLOR`/`CLICOLOR` 等）自动保留或剥离 ANSI 颜色码
 
 ### 开发依赖
 - `tempfile 3.0`: 测试用临时文件创建
 - `criterion 0.5`: 性能基准测试框架，支持 HTML 报告
 - `assert_cmd 2.0`: 集成测试工具
-- `predicates 3.0`: 测试断言库
 
 ### 项目结构注意
 - 项目同时定义了二进制目标和库目标
@@ -145,8 +143,8 @@ cargo bench --bench regression_simple  # 运行回归测试（用于 CI/CD）
 ### 常见问题
 
 1. **基准测试编译错误**
-   - 确保 `term` crate 的 terminal trait 实现正确
-   - 基准测试不依赖实际终端输出，使用模拟终端
+   - 基准测试通过库目标 `tree_cli` 访问内部模块，需确保 `src/lib.rs` 已导出对应模块
+   - 基准测试直接构造 `Config` 并驱动迭代器，不涉及终端输出
 
 2. **性能测试超时**
    - 减少测试数据量或增加 sample 数量

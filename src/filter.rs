@@ -80,7 +80,6 @@ mod tests {
     fn test_filtered_iterator_new() {
         let temp_dir = TempDir::new().unwrap();
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 2,
@@ -100,7 +99,6 @@ mod tests {
     fn test_skip_filter() {
         let temp_dir = TempDir::new().unwrap();
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 2,
@@ -126,7 +124,6 @@ mod tests {
         let file_item3 = FileItem::new(&temp_dir.path().join("file.txt"), 3, true); // 更高层级
 
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 2,
@@ -162,7 +159,6 @@ mod tests {
         fs::write(temp_dir.path().join("subdir/file2.txt"), "content2").unwrap();
 
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 2,
@@ -200,7 +196,6 @@ mod tests {
         fs::write(temp_dir.path().join("file2.rs"), "content2").unwrap();
 
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 1,
@@ -232,7 +227,6 @@ mod tests {
         fs::write(temp_dir.path().join("nonempty_dir/file.txt"), "content").unwrap();
 
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 2,

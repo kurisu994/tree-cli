@@ -6,6 +6,8 @@
 use std::io::Write;
 use std::path::Path;
 
+use anstream::AutoStream;
+use anstream::ColorChoice;
 use clap::Parser;
 use globset::Glob;
 
@@ -54,25 +56,18 @@ fn main() {
     } = Args::parse();
     let path = Path::new(&dir);
 
-    // 在非 TTY 环境（如 CI）中，term::stdout() 返回 None
-    // 此时使用缓冲输出（自动禁用彩色）
-    let mut mt = term::stdout().unwrap_or_else(|| {
-        // 创建一个基于标准输出的缓冲终端
-        Box::new(term::terminfo::TerminfoTerminal::new(std::io::stdout()).unwrap())
-    });
-
-    // 如果不是 TTY 环境，自动禁用彩色输出（除非用户明确指定 --color）
-    let is_tty = term::stdout().is_some();
-    let colorful = if color_on {
-        true
+    // 颜色决策交给 anstream：Auto 会综合判断是否 TTY 及 NO_COLOR/CLICOLOR 等环境变量，
+    // 非彩色场景下写入的 ANSI 转义码会被自动剥离。
+    let choice = if color_on {
+        ColorChoice::Always
     } else if color_off {
-        false
+        ColorChoice::Never
     } else {
-        is_tty
+        ColorChoice::Auto
     };
+    let mut out = AutoStream::new(std::io::stdout(), choice);
 
     let config = Config {
-        colorful,
         show_all,
         size,
         max_level,
@@ -87,8 +82,8 @@ fn main() {
                 .compile_matcher()
         }),
     };
-    let mut dir_tree = DirTree::new(config, &mut mt);
+    let mut dir_tree = DirTree::new(config, &mut out);
     let DirSummary { num_folders, num_files } = dir_tree.print_folders(path).expect("execution failure");
 
-    writeln!(mt, "\n{} directories, {} files", num_folders, num_files).unwrap()
+    writeln!(out, "\n{} directories, {} files", num_folders, num_files).unwrap()
 }

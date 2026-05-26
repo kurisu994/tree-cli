@@ -195,7 +195,6 @@ mod tests {
     fn test_file_iterator_new() {
         let temp_dir = TempDir::new().unwrap();
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 2,
@@ -214,7 +213,6 @@ mod tests {
     fn test_is_glob_included() {
         let temp_dir = TempDir::new().unwrap();
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 2,
@@ -235,7 +233,6 @@ mod tests {
 
         // 不显示隐藏文件
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 2,
@@ -251,7 +248,6 @@ mod tests {
 
         // 显示隐藏文件
         let config = Config {
-            colorful: false,
             size: false,
             show_all: true,
             max_level: 2,
@@ -273,7 +269,6 @@ mod tests {
         fs::write(temp_dir.path().join("file2.rs"), "content2").unwrap();
 
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 0, // 不进入子目录
@@ -303,7 +298,6 @@ mod tests {
         fs::write(temp_dir.path().join("file1.txt"), "content1").unwrap();
 
         let config = Config {
-            colorful: false,
             size: false,
             show_all: false,
             max_level: 1, // 允许进入一层子目录
